@@ -174,6 +174,10 @@ campaign ids and session tokens in the same emails are left alone.
 
 ## Before production
 
+Run `gh workflow run diag-cargo-pax.yml -R 8exgh/devops` at any time for the
+live mail-domain state (including the DNS records still to publish) and
+recent container logs; there is no SSH to server7.
+
 1. **Decide the mail domain.** `MAIL_DOMAIN` is configurable. Either cut
    `cargopax.ca` over to Migadu (replace the SES `MX`, add SPF/DKIM/DMARC —
    this stops the original AWS app receiving mail), or point the rebuild at
@@ -182,11 +186,14 @@ campaign ids and session tokens in the same emails are left alone.
 2. **Optionally move that zone to Cloudflare** and set `CLOUDFLARE_API_TOKEN`
    so the app publishes and repairs the mail records itself. Otherwise read
    them off `GET /api/queries/mail-domain` and publish them by hand once.
-3. **`DEPLOY_TOKEN`** on this repo: a PAT with `repo` scope on `8exgh/devops`
-   (`gh secret set DEPLOY_TOKEN -R 8exgh/cargo-pax`), so CI can dispatch the
-   deploy.
-4. **Public route**: a Cloudflare tunnel entry on Server3 →
-   `192.168.4.56:3056` for whatever hostname the site should answer on.
+3. **`DEPLOY_TOKEN`** on this repo: done — a PAT with `repo` scope on
+   `8exgh/devops`, so CI can dispatch the deploy.
+4. **Public route**: done — the site answers on
+   <https://cargopax.fusenv.com> through the Server3 tunnel
+   (`configure-cargo-pax-cloudflare.yml` in devops). It is on `fusenv.com`
+   because a `cfargotunnel.com` CNAME only resolves when Cloudflare proxies
+   it, which `cargopax.ca` cannot do from Google Cloud DNS; change
+   `HOSTNAME`/`ZONE_NAME` in that workflow and re-run once the zone moves.
 
 ## Getting Started
 
