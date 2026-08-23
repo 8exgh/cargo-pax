@@ -1,0 +1,25 @@
+[package]
+name = "command_handler"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "4"
+actix-rt = "2.8.0"
+log = "0.4.18"
+env_logger = "0.10.0"
+futures="0.3.28"
+serde_json="1.0.103"
+serde = { version = "1.0.164", features =["derive"] }
+tokio-postgres = "0.7.8"
+tokio = "1.29.1"
+bb8-postgres = "0.8.1"
+actix-cors = "0.6.4"
+reqwest = "0.11.20"
+async-trait = "0.1.73"
+chrono = "0.4.30"
+url = "2.4.1"
+
+
