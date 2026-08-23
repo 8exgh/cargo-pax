@@ -1,5 +1,5 @@
 import { loadEvents, getPayloadBlobByEventId } from '@/lib/db/tenant-db';
-import { getTenantIds } from '@/lib/db/system';
+import { getTenantIds, getUsersByTenant } from '@/lib/db/system';
 import { replayEvents } from '@/lib/commands/event-replay';
 import { accountAggregateId } from '@/lib/commands/account-commands';
 import { COMPANY_LABELS, deliveryCompanyForUrl } from '@/lib/tracking/carrier';
@@ -8,6 +8,7 @@ import {
   AccountView,
   EmailMessageContent,
   EmailMessageToProcess,
+  InvitationEmailTask,
   MailboxDeletionTask,
   MailboxTask,
   MailboxToPoll,
@@ -92,14 +93,34 @@ function toTrackerView(t: Tracker): TrackerView {
   };
 }
 
-export function getAccountView(tenantId: string): AccountView | null {
+export function getAccountView(tenantId: string, userId: string): AccountView | null {
   const state = getAccountState(tenantId);
   if (state.status !== 'created') {
     return null;
   }
 
+  // The users table is the authority on who belongs and what they may do;
+  // the stream carries the organization's own facts (name, logo).
+  const users = getUsersByTenant(tenantId);
+  const you = users.find(u => u.id === userId);
+
   const trackers = [...state.trackers].reverse().map(toTrackerView);
   return {
+    organization: {
+      name: state.organizationName ?? (state.email ? state.email.split('@')[1] : 'Your organization'),
+      hasLogo: state.organizationLogo !== null,
+      logoVersion: state.organizationLogo?.eventId ?? null
+    },
+    you: { userId, email: you?.email ?? state.email!, role: (you?.role as 'admin' | 'member') ?? 'member' },
+    members: users
+      .map(u => ({
+        userId: u.id,
+        email: u.email,
+        role: u.role as 'admin' | 'member',
+        createdAt: u.created_at,
+        isYou: u.id === userId
+      }))
+      .sort((a, b) => a.createdAt - b.createdAt),
     email: state.email!,
     verified: state.verified,
     pushEndpoints: state.pushSubscriptions.map(p => p.endpoint),
@@ -344,6 +365,35 @@ export function getShipmentNotificationsToSend(): ShipmentNotificationTask[] {
 // Trackers with changes nobody has been pushed about yet, for accounts that
 // have at least one subscribed device. Mirrors the email query but keeps its
 // own pending list, so a push failure never eats an email and vice versa.
+export function getOrganizationLogo(tenantId: string): { blob: Buffer; mimeType: string; version: number } | null {
+  const logo = getAccountState(tenantId).organizationLogo;
+  if (!logo) {
+    return null;
+  }
+  const blob = getPayloadBlobByEventId(tenantId, logo.eventId);
+  return blob ? { blob, mimeType: logo.mimeType, version: logo.eventId } : null;
+}
+
+// Invitations whose welcome-with-password email has not gone out yet
+export function getInvitationEmailsToSend(): InvitationEmailTask[] {
+  const tasks: InvitationEmailTask[] = [];
+  for (const { tenantId, state } of accountStates()) {
+    for (const member of state.members) {
+      if (member.invitationEmailSent || member.removed || !member.temporaryPassword) {
+        continue;
+      }
+      tasks.push({
+        tenantId,
+        userId: member.userId,
+        email: member.email,
+        organizationName: state.organizationName ?? 'CargoPax',
+        temporaryPassword: member.temporaryPassword
+      });
+    }
+  }
+  return tasks;
+}
+
 export function getPushNotificationsToSend(): PushNotificationTask[] {
   const tasks: PushNotificationTask[] = [];
   for (const { tenantId, state } of accountStates()) {

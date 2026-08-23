@@ -52,12 +52,16 @@ scale).
 - `nextjs-app/lib/push.ts` + `public/sw.js` + `components/PushNotifications.tsx` — web push (VAPID, `VAPID_*` env). Subscriptions are events (`web_push_subscription_registered`/`_removed`, the original's device-registration shape); trackers keep a separate `pendingPushChanges` list so push and email never eat each other's work; a 404/410 from the push service drops the subscription. iOS only delivers to a Home Screen install, so the UI shows install steps to iOS-in-a-tab rather than a dead button.
 - `nextjs-app/lib/migadu.ts`, `lib/mailbox.ts` — Migadu adapter (mailboxes + domain endpoints, `parseMigaduRecords`); address rules, reserved list, availability check
 - `nextjs-app/lib/mail-domain.ts` + `lib/cloudflare.ts` — converges MAIL_DOMAIN on Migadu each pump (add domain → read required DNS → publish to Cloudflare when the zone is ours → activate), caches for 6h, and reports the records to publish by hand otherwise (`GET /api/queries/mail-domain?recheck=1`). Ported from 8examples' `ensureMailboxDns`/`createZoneRecords`.
-- `nextjs-app/lib/auth/middleware.ts` — `requireAuth`, `requireApiKey`, `requireVerifiedUser` (403 + `needsVerification`)
+- `nextjs-app/lib/auth/middleware.ts` — `requireAuth`, `requireApiKey`, `requireVerifiedUser` (any member), `requireVerifiedAdmin` (403 `forbidden`). **`authenticateRequest` resolves the user from the users table on every request**, so role and the role itself come from the database, never the JWT: a demotion or removal takes effect immediately instead of when a week-old token expires.
+- `nextjs-app/components/OrganizationSettings.tsx` / `MemberSettings.tsx` / `OrganizationLogo.tsx` — organization name, logo (stored as the `organization_logo_set` event's blob, served only to that organization; the `<img>` cannot send a bearer token so the component fetches it and uses a blob URL), and people management
 - `background-processor/src/jobs/mailbox-poll.ts` — IMAP poll per account (`utils/imap-client.ts`: imapflow + mailparser, UID cursor, UIDVALIDITY reset)
 - `background-processor/src/jobs/email-processing.ts` — links (`utils/email-url-extractor.ts`) → label (`computeLabel`) → `start-tracking-shipment` → `mark-email-message-as-processed`
 - `background-processor/src/jobs/tracker-refresh.ts` — Bing `#package_tr_ans` for UPS/FedEx/USPS/DHL, carrier page fallback → `utils/tracker-html-analyzer.ts` (`ShipmentJourneySchema`, Responses API + `zodTextFormat`, `OPENAI_MODEL` default `gpt-5.4-mini`) → `utils/shipment-status.ts` → `update-tracking-shipment-status`
 
 Conventions worth keeping:
+
+- One organization per tenant. Signup makes the registrant its admin; everyone else is invited and is **read-only by default, except refreshing a status** - that is deliberate, not an oversight. The last admin cannot be demoted or removed (`countAdmins`).
+- Roles live in `users.role` (with the credentials), organization facts live in the stream. Adding a role check means `requireVerifiedAdmin`, not reading `payload.role`.
 
 - Event names are snake_case and follow the original cargopax backend where a concept exists there.
 - Web push needs no Apple/Firebase accounts, just the VAPID keypair in devops (`CARGO_PAX_VAPID_*`); `app/manifest.ts` + `public/icon-*.png` exist so the iOS Home Screen install looks right, and `send-test-push` is how you confirm an install took.

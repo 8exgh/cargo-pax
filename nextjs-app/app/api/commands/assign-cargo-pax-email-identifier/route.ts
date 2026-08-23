@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireVerifiedUser } from '@/lib/auth/middleware';
+import { requireVerifiedAdmin } from '@/lib/auth/middleware';
 import { serverError, unauthorized } from '@/lib/api/respond';
 import { updateTenantMailboxLocalPart } from '@/lib/db/system';
 import { handleAssignCargoPaxEmailIdentifier } from '@/lib/commands/account-commands';
@@ -17,7 +17,7 @@ const Schema = z.object({ emailIdentifier: z.string().min(1).max(64) });
 // a new inbox is provisioned for the name and the old one retired.
 export async function POST(request: NextRequest) {
   try {
-    const auth = requireVerifiedUser(request);
+    const auth = requireVerifiedAdmin(request);
     if (!auth.authenticated || !auth.tenantId) {
       return unauthorized(auth);
     }

@@ -7,7 +7,12 @@ import {
   AssignCargoPaxEmailIdentifierCommand,
   AssignTrackerToGroupCommand,
   CompletePasswordResetCommand,
+  ChangeMemberRoleCommand,
   CreateAccountCommand,
+  InviteMemberCommand,
+  NameOrganizationCommand,
+  RemoveMemberCommand,
+  SetOrganizationLogoCommand,
   CreateGroupCommand,
   DeleteTrackingShipmentCommand,
   IssueVerificationCodeCommand,
@@ -39,6 +44,13 @@ export const REFRESH_PRIORITY = 3;
 
 // Parsed email bodies are capped so one huge forward cannot bloat the store
 export const MAX_EMAIL_BODY_CHARS = 400_000;
+
+// A logo lives in the event store like everything else, so it replays with
+// the organization and needs no separate file storage.
+export const MAX_LOGO_BYTES = 512 * 1024;
+// No SVG: it is a script-bearing document, and this one is served back to
+// browsers.
+export const ALLOWED_LOGO_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -106,10 +118,114 @@ export function handleCreateAccount(tenantId: string, command: CreateAccountComm
     throw new Error('Account already created');
   }
 
-  const v = append(tenantId, version, 'account_created', { email: command.email });
+  let v = append(tenantId, version, 'account_created', { email: command.email });
+  v = append(tenantId, v, 'organization_named', { name: command.organizationName });
   append(tenantId, v, 'cargo_pax_email_identifier_assigned', {
     emailIdentifier: command.emailIdentifier,
     domain: command.mailboxDomain
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* Organization                                                       */
+/* ------------------------------------------------------------------ */
+
+export function handleNameOrganization(tenantId: string, command: NameOrganizationCommand): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+  const name = command.name.trim();
+  if (!name) {
+    throw new Error('An organization name is required');
+  }
+  if (name === state.organizationName) {
+    return;
+  }
+
+  append(tenantId, version, 'organization_named', { name: name.slice(0, 120) });
+}
+
+export function handleSetOrganizationLogo(tenantId: string, command: SetOrganizationLogoCommand): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+  if (!ALLOWED_LOGO_TYPES.includes(command.mimeType)) {
+    throw new Error(`That image type is not supported (${ALLOWED_LOGO_TYPES.join(', ')})`);
+  }
+  if (command.bytes.length === 0) {
+    throw new Error('That file is empty');
+  }
+  if (command.bytes.length > MAX_LOGO_BYTES) {
+    throw new Error(`That image is too big (limit ${Math.round(MAX_LOGO_BYTES / 1024)} KB)`);
+  }
+
+  append(
+    tenantId,
+    version,
+    'organization_logo_set',
+    { mimeType: command.mimeType, sizeBytes: command.bytes.length, filename: command.filename.slice(0, 120) },
+    command.bytes
+  );
+}
+
+export function handleRemoveOrganizationLogo(tenantId: string): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+  if (!state.organizationLogo) {
+    return;
+  }
+
+  append(tenantId, version, 'organization_logo_removed', {});
+}
+
+/* ------------------------------------------------------------------ */
+/* Members                                                            */
+/* ------------------------------------------------------------------ */
+
+export function handleInviteMember(tenantId: string, command: InviteMemberCommand): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+
+  append(tenantId, version, 'member_invited', {
+    userId: command.userId,
+    email: command.email,
+    role: command.role,
+    invitedBy: command.invitedBy,
+    temporaryPassword: command.temporaryPassword
+  });
+}
+
+export function handleRecordInvitationEmailSent(tenantId: string, userId: string, to: string): void {
+  const { state, version } = load(tenantId);
+  const member = state.members.find(m => m.userId === userId);
+  if (!member) {
+    throw new Error('Unknown member');
+  }
+  if (member.invitationEmailSent) {
+    throw new Error('Invitation already sent');
+  }
+
+  append(tenantId, version, 'invitation_email_sent', { userId, to });
+}
+
+export function handleChangeMemberRole(tenantId: string, command: ChangeMemberRoleCommand): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+
+  append(tenantId, version, 'member_role_changed', {
+    userId: command.userId,
+    email: command.email,
+    role: command.role,
+    changedBy: command.changedBy
+  });
+}
+
+export function handleRemoveMember(tenantId: string, command: RemoveMemberCommand): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+
+  append(tenantId, version, 'member_removed', {
+    userId: command.userId,
+    email: command.email,
+    removedBy: command.removedBy
   });
 }
 

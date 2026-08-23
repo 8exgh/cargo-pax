@@ -7,6 +7,11 @@ export function unauthorized(auth: AuthResult): NextResponse {
   if (auth.needsVerification) {
     return NextResponse.json({ error: auth.error, needsVerification: true }, { status: 403 });
   }
+  // Signed in, but not allowed: 403, so the UI can say so rather than
+  // bouncing someone to the login page they just came from.
+  if (auth.error === 'Only an admin can do that') {
+    return NextResponse.json({ error: auth.error, forbidden: true }, { status: 403 });
+  }
   return NextResponse.json({ error: auth.error || 'Unauthorized' }, { status: 401 });
 }
 

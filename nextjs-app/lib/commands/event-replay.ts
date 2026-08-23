@@ -29,6 +29,9 @@ function isoDate(timestamp: number): string {
 export function replayEvents(events: Event[]): AccountState {
   const state: AccountState = {
     status: 'not-created',
+    organizationName: null,
+    organizationLogo: null,
+    members: [],
     verified: false,
     verification: null,
     ownerNotified: false,
@@ -50,6 +53,66 @@ export function replayEvents(events: Event[]): AccountState {
         state.email = data.email;
         state.createdAt = event.timestamp;
         break;
+
+      case 'organization_named':
+        state.organizationName = data.name;
+        break;
+
+      case 'organization_logo_set':
+        state.organizationLogo = {
+          mimeType: data.mimeType,
+          sizeBytes: data.sizeBytes,
+          filename: data.filename,
+          eventId: event.id
+        };
+        break;
+
+      case 'organization_logo_removed':
+        state.organizationLogo = null;
+        break;
+
+      case 'member_invited': {
+        const existing = state.members.find(m => m.userId === data.userId);
+        if (existing) {
+          existing.role = data.role;
+          existing.removed = false;
+        } else {
+          state.members.push({
+            userId: data.userId,
+            email: data.email,
+            role: data.role,
+            temporaryPassword: data.temporaryPassword ?? '',
+            invitedAt: event.timestamp,
+            invitationEmailSent: false,
+            removed: false
+          });
+        }
+        break;
+      }
+
+      case 'member_role_changed': {
+        const member = state.members.find(m => m.userId === data.userId);
+        if (member) {
+          member.role = data.role;
+        }
+        break;
+      }
+
+      case 'member_removed': {
+        const member = state.members.find(m => m.userId === data.userId);
+        if (member) {
+          member.removed = true;
+        }
+        break;
+      }
+
+      case 'invitation_email_sent': {
+        const member = state.members.find(m => m.userId === data.userId);
+        if (member) {
+          member.invitationEmailSent = true;
+        }
+        break;
+      }
 
       case 'account_verification_code_issued':
         state.verification = { code: data.code, expiresAt: data.expiresAt, emailSent: false };

@@ -5,6 +5,7 @@ import { createMailbox, deleteMailbox, generatePassword, getMailbox, migaduConfi
 import { ensureMailDomain, getMailDomainStatus } from '@/lib/mail-domain';
 import { MAIL_HOSTS } from '@/lib/site';
 import {
+  getInvitationEmailsToSend,
   getMailboxesToDelete,
   getMailboxesToProvision,
   getOwnerNotificationsToSend,
@@ -19,6 +20,7 @@ import {
   handleRecordMailboxDeleted,
   handleRecordMailboxProvisionFailed,
   handleRecordMailboxProvisioned,
+  handleRecordInvitationEmailSent,
   handleRecordOwnerNotified,
   handleRecordPasswordResetEmailSent,
   handleRecordVerificationEmailSent,
@@ -69,6 +71,7 @@ async function runJobs(): Promise<void> {
   await provisionMailboxes();
   await deleteRetiredMailboxes();
   await sendWelcomeEmails();
+  await sendInvitationEmails();
   await notifyOwnerOfSignups();
   await sendShipmentNotifications();
   await sendPushNotifications();
@@ -210,6 +213,40 @@ async function sendWelcomeEmails(): Promise<void> {
       }
     } catch (error: any) {
       log.error(`Welcome email to ${task.email} failed:`, error);
+    }
+  }
+}
+
+/* Someone an admin added gets their way in: the address, a one-time
+   password, and the fact that they will be asked to change it. */
+async function sendInvitationEmails(): Promise<void> {
+  if (!mailConfigured()) {
+    return;
+  }
+  for (const task of getInvitationEmailsToSend()) {
+    try {
+      const sent = await sendEmail({
+        to: task.email,
+        subject: `You have been added to ${task.organizationName} on ${SITE_NAME}`,
+        text: [
+          `${task.organizationName} uses ${SITE_NAME} to track its shipments, and you have been added to it.`,
+          '',
+          `Sign in at ${getAppBaseUrl()}`,
+          `Email:    ${task.email}`,
+          `Password: ${task.temporaryPassword}`,
+          '',
+          'You will be asked to choose your own password when you first sign in.',
+          '',
+          'You can see every shipment the organization is tracking and ask for a',
+          'fresh check on any of them. An admin can give you more if you need it.'
+        ].join('\n')
+      });
+      if (sent) {
+        handleRecordInvitationEmailSent(task.tenantId, task.userId, task.email);
+        log.info(`Invitation email sent to ${task.email}`);
+      }
+    } catch (error: any) {
+      log.error(`Invitation email to ${task.email} failed:`, error);
     }
   }
 }

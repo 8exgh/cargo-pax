@@ -5,6 +5,14 @@
 // markers. Event names follow the original cargopax backend where the
 // concept exists there.
 export type EventType =
+  // organization
+  | 'organization_named'
+  | 'organization_logo_set'
+  | 'organization_logo_removed'
+  | 'member_invited'
+  | 'member_role_changed'
+  | 'member_removed'
+  | 'invitation_email_sent'
   // account + auth
   | 'account_created'
   | 'account_verification_code_issued'
@@ -64,6 +72,48 @@ export interface ShipmentChange {
 
 export interface AccountCreatedData {
   email: string;
+}
+
+export interface OrganizationNamedData {
+  name: string;
+}
+
+// The image itself rides on the event as payload_blob
+export interface OrganizationLogoSetData {
+  mimeType: string;
+  sizeBytes: number;
+  filename: string;
+}
+
+/* Membership is an organization fact, so it is in the stream; the users
+   table stays the authority for credentials and for the role that gates a
+   request, because that is what authorization reads on every call. */
+export interface MemberInvitedData {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member';
+  invitedBy: string;
+  // Emailed once, then the member must change it. Stored like the mailbox
+  // passwords and reset tokens already are.
+  temporaryPassword: string;
+}
+
+export interface MemberRoleChangedData {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member';
+  changedBy: string;
+}
+
+export interface MemberRemovedData {
+  userId: string;
+  email: string;
+  removedBy: string;
+}
+
+export interface InvitationEmailSentData {
+  userId: string;
+  to: string;
 }
 
 export interface AccountVerificationCodeIssuedData {
@@ -312,8 +362,28 @@ export interface PasswordReset {
   completed: boolean;
 }
 
+export interface OrganizationLogo {
+  mimeType: string;
+  sizeBytes: number;
+  filename: string;
+  eventId: number;
+}
+
+export interface Member {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member';
+  temporaryPassword: string;
+  invitedAt: number;
+  invitationEmailSent: boolean;
+  removed: boolean;
+}
+
 export interface AccountState {
   status: 'not-created' | 'created';
+  organizationName: string | null;
+  organizationLogo: OrganizationLogo | null;
+  members: Member[];
   email?: string;
   createdAt?: number;
   verified: boolean;

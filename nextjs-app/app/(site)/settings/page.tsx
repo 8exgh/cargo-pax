@@ -7,6 +7,8 @@ import { Header } from '@/components/Header';
 import { Spinner } from '@/components/Spinner';
 import type { AccountView } from '@/types/queries';
 import { PushNotifications } from '@/components/PushNotifications';
+import { OrganizationSettings } from '@/components/OrganizationSettings';
+import { MemberSettings } from '@/components/MemberSettings';
 
 function normalizeLocalPart(raw: string): string {
   return raw.toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40);
@@ -132,13 +134,22 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header email={account.email} onLogout={handleLogout} />
+      <Header email={account.you.email} organization={account.organization} role={account.you.role} onLogout={handleLogout} />
       <div className="max-w-3xl mx-auto p-4 space-y-6">
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
 
+        <OrganizationSettings account={account} onChanged={load} />
+        <MemberSettings account={account} onChanged={load} />
+
         <section className="bg-white rounded-lg shadow p-6 space-y-4">
           <h2 className="text-lg font-semibold text-gray-900">Your {domain} address</h2>
-          {mailbox && !editing && (
+          {mailbox && !editing && account.you.role !== 'admin' && (
+            <p className="text-gray-700">
+              Forward shipment emails to <span className="font-mono font-medium">{mailbox.address}</span> and they
+              show up for everyone here. Only an admin can change the address.
+            </p>
+          )}
+          {mailbox && !editing && account.you.role === 'admin' && (
             <>
               <p className="text-gray-700">
                 Forward your shipment emails from FedEx, UPS, Canada Post and the rest to{' '}
@@ -233,7 +244,11 @@ export default function Settings() {
 
         <section className="bg-white rounded-lg shadow p-6 text-sm text-gray-700 space-y-2">
           <h2 className="text-lg font-semibold text-gray-900">Account</h2>
-          <p>Signed in as <span className="font-medium">{account.email}</span>. Shipment updates go there.</p>
+          <p>
+            Signed in as <span className="font-medium">{account.you.email}</span>
+            {account.you.role === 'admin' ? ' (admin)' : ' (read only)'}. Shipment updates are emailed to{' '}
+            <span className="font-medium">{account.email}</span>.
+          </p>
           <Link href="/change-password" className="text-blue-600 hover:underline">Change password</Link>
         </section>
 

@@ -16,14 +16,15 @@ const log = getLogger('api/auth/register');
 const RegisterSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  emailIdentifier: z.string().min(1).max(64)
+  emailIdentifier: z.string().min(1).max(64),
+  organizationName: z.string().trim().min(1).max(120)
 });
 
-// Signup, the shape of the original /signup: creates the tenant (the
-// account), its user, and the account stream, which starts with
-// account_created + cargo_pax_email_identifier_assigned for the
-// @cargopax.ca name the user picked, then issues a verification code the
-// send-verification-email job mails. Login is allowed once verified.
+// Signup creates an organization and makes the registrant its admin: the
+// tenant, its first user, and the account stream (account_created,
+// organization_named, cargo_pax_email_identifier_assigned), then a
+// verification code the send-verification-email job mails. Login is allowed
+// once verified. Everyone else joins by invitation from an admin.
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -81,7 +82,12 @@ export async function POST(request: NextRequest) {
       throw error;
     }
 
-    handleCreateAccount(tenantId, { email, emailIdentifier, mailboxDomain });
+    handleCreateAccount(tenantId, {
+      email,
+      emailIdentifier,
+      mailboxDomain,
+      organizationName: validation.data.organizationName
+    });
     handleIssueVerificationCode(tenantId, {
       code: generateVerificationCode(),
       expiresAt: Date.now() + VERIFICATION_CODE_TTL_MS
@@ -94,7 +100,7 @@ export async function POST(request: NextRequest) {
     // itself stays behind the verification gate.
     const token = signToken({ userId, tenantId, role: 'admin' });
 
-    log.info(`Registered ${email} with address ${emailIdentifier}@${mailboxDomain} (user ${userId}, tenant ${tenantId})`);
+    log.info(`Registered ${email} as admin of "${validation.data.organizationName}" with address ${emailIdentifier}@${mailboxDomain} (user ${userId}, tenant ${tenantId})`);
     return NextResponse.json({
       userId,
       token,

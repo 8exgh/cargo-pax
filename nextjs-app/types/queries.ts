@@ -51,7 +51,25 @@ export interface EmailMessageView {
   trackerIds: string[];
 }
 
+export interface MemberView {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member';
+  createdAt: number;
+  isYou: boolean;
+}
+
+export interface OrganizationView {
+  name: string;
+  hasLogo: boolean;
+  logoVersion: number | null;
+}
+
 export interface AccountView {
+  organization: OrganizationView;
+  // The signed-in user's own place in it
+  you: { userId: string; email: string; role: 'admin' | 'member' };
+  members: MemberView[];
   email: string;
   verified: boolean;
   // Endpoints this account has registered, so the UI can tell whether *this*
@@ -157,6 +175,14 @@ export interface PushSubscriptionView {
   endpoint: string;
   p256dh: string;
   auth: string;
+}
+
+export interface InvitationEmailTask {
+  tenantId: string;
+  userId: string;
+  email: string;
+  organizationName: string;
+  temporaryPassword: string;
 }
 
 export interface PushNotificationTask {

@@ -11,11 +11,11 @@ const log = getLogger('api/queries/account');
 export async function GET(request: NextRequest) {
   try {
     const auth = requireAuth(request);
-    if (!auth.authenticated || !auth.tenantId) {
+    if (!auth.authenticated || !auth.tenantId || !auth.userId) {
       return unauthorized(auth);
     }
 
-    const account = getAccountView(auth.tenantId);
+    const account = getAccountView(auth.tenantId, auth.userId);
     if (!account) {
       return NextResponse.json({ error: 'Account not found' }, { status: 404 });
     }

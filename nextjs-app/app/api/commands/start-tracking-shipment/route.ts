@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authenticateRequest, requireVerifiedUser } from '@/lib/auth/middleware';
+import { authenticateRequest, requireVerifiedAdmin } from '@/lib/auth/middleware';
 import { serverError, unauthorized } from '@/lib/api/respond';
 import { handleStartTrackingShipment } from '@/lib/commands/account-commands';
 import { isAllowedTrackingUrl } from '@/lib/queries/account-queries';
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       tenantId = body.tenantId;
       source = 'email';
     } else {
-      const auth = requireVerifiedUser(request);
+      const auth = requireVerifiedAdmin(request);
       if (!auth.authenticated || !auth.tenantId) {
         return unauthorized(auth);
       }

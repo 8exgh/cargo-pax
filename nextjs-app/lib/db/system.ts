@@ -13,9 +13,9 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-// A tenant is one CargoPax account: its registrant, and the event store
-// holding its trackers and issued mailbox. The mailbox name is mirrored
-// here (from the account_created event) purely for the UNIQUE constraint.
+// A tenant is one organization: its people (users), and the event store
+// holding its name, logo, trackers and issued mailbox. The mailbox name is
+// mirrored here (from the account stream) purely for the UNIQUE constraint.
 export interface Tenant {
   id: string;
   mailbox_local_part: string | null;
@@ -90,6 +90,23 @@ export function getUsersByTenant(tenantId: string): User[] {
   return db.prepare('SELECT * FROM users WHERE tenant_id = ?').all(tenantId) as User[];
 }
 
+/* Adds a person to an existing organization. The caller hashes the password
+   first: better-sqlite3 is synchronous. */
+export function createUser(user: {
+  id: string;
+  tenant_id: string;
+  email: string;
+  password_hash: string;
+  role: 'admin' | 'member';
+  must_change_password: number;
+}): void {
+  const db = getSystemDb();
+  db.prepare(`
+    INSERT INTO users (id, tenant_id, email, password_hash, role, must_change_password, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(user.id, user.tenant_id, user.email.trim().toLowerCase(), user.password_hash, user.role, user.must_change_password, Date.now());
+}
+
 // Registration creates the tenant and its admin atomically. The password must
 // be hashed by the caller first: better-sqlite3 transactions are synchronous.
 export function createTenantWithAdmin(params: {
@@ -109,6 +126,25 @@ export function createTenantWithAdmin(params: {
       VALUES (?, ?, ?, ?, 'admin', 0, ?)
     `).run(params.userId, params.tenantId, params.email.trim().toLowerCase(), params.passwordHash, now);
   })();
+}
+
+/* The role that gates every request lives here beside the credentials, so
+   authorization never has to replay a stream to answer "may they?". The
+   organization's stream keeps the history of who changed it. */
+export function updateUserRole(userId: string, role: 'admin' | 'member'): void {
+  const db = getSystemDb();
+  db.prepare('UPDATE users SET role = ? WHERE id = ?').run(role, userId);
+}
+
+export function deleteUser(userId: string): void {
+  const db = getSystemDb();
+  db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+}
+
+export function countAdmins(tenantId: string): number {
+  const db = getSystemDb();
+  const row = db.prepare("SELECT COUNT(*) AS n FROM users WHERE tenant_id = ? AND role = 'admin'").get(tenantId) as { n: number };
+  return row.n;
 }
 
 export function updateUserPassword(userId: string, newPasswordHash: string, mustChangePassword: number = 0): void {

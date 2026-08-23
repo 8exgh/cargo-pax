@@ -20,6 +20,8 @@ function normalizeLocalPart(raw: string): string {
 
 export default function Register() {
   const [email, setEmail] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
+  const [logo, setLogo] = useState<File | null>(null);
   const [mailboxLocalPart, setMailboxLocalPart] = useState('');
   const [availability, setAvailability] = useState<Availability>({ state: 'idle' });
   const [mailDomain, setMailDomain] = useState('cargopax.ca');
@@ -98,12 +100,17 @@ export default function Register() {
       setLoading(false);
       return;
     }
+    if (!organizationName.trim()) {
+      setError('Give your organization a name');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, emailIdentifier: mailboxLocalPart })
+        body: JSON.stringify({ email, password, emailIdentifier: mailboxLocalPart, organizationName })
       });
 
       if (!response.ok) {
@@ -120,6 +127,22 @@ export default function Register() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('userId', data.userId);
       localStorage.setItem('pendingEmail', email);
+
+      // The organization exists now, so its logo can go up. A failure here
+      // must not cost someone their account - it is changeable in Settings.
+      if (logo) {
+        try {
+          const body = new FormData();
+          body.append('logo', logo);
+          await fetch('/api/commands/set-organization-logo', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${data.token}` },
+            body
+          });
+        } catch {
+          /* carry on to verification */
+        }
+      }
       router.push(`/verify?email=${encodeURIComponent(email)}`);
     } catch (error: any) {
       setError(error.message || 'An error occurred');
@@ -139,11 +162,44 @@ export default function Register() {
           Create your account
         </h1>
         <p className="text-center text-gray-600 mb-8">
-          Pick your @{mailDomain} address: forward shipment emails to it and
-          CargoPax tracks the packages for you
+          You will be the admin of a new organization, with its own @{mailDomain}
+          address for forwarding shipment emails
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
+              Organization name
+            </label>
+            <input
+              id="organizationName"
+              type="text"
+              value={organizationName}
+              onChange={(e) => setOrganizationName(e.target.value)}
+              required
+              maxLength={120}
+              placeholder="Acme Tools Ltd."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Everyone you add later shares this organization&apos;s shipments.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="logo" className="block text-sm font-medium text-gray-700 mb-1">
+              Logo <span className="font-normal text-gray-500">(optional)</span>
+            </label>
+            <input
+              id="logo"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              onChange={(e) => setLogo(e.target.files?.[0] ?? null)}
+              className="w-full text-sm text-gray-700 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+            />
+            <p className="mt-1 text-xs text-gray-500">PNG, JPEG, WebP or GIF, up to 512 KB. You can add it later instead.</p>
+          </div>
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
               Your email

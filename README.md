@@ -25,6 +25,36 @@ and **no AWS**. What the original did with AWS is done here as:
 | TypeChat + GPT-3.5, five questions per page | OpenAI structured outputs, one call per page (`gpt-5.4-mini`) |
 | Postgres event store | SQLite, one event store per account |
 
+## Organizations and people
+
+Signing up creates an **organization** and makes you its admin. It has a
+name, an optional logo, one `@cargopax.ca` forwarding address, and one
+shared set of shipments.
+
+An admin adds people by email; they get a one-time password and are asked to
+change it on first sign-in. **New people are read-only** — they see every
+shipment and can **ask for a fresh check on any of them**, which is the part
+everyone actually wants, but cannot change what is tracked, who is in the
+organization, or what it is called. An admin can promote anyone to admin, or
+demote them; the last admin cannot be demoted or removed, so an organization
+can never be left with nobody who can manage it.
+
+| | read only | admin |
+|---|---|---|
+| See shipments, journeys, forwarded emails | ✅ | ✅ |
+| Refresh a shipment's status | ✅ | ✅ |
+| Notifications on their own device | ✅ | ✅ |
+| Add, rename, group or delete shipments | — | ✅ |
+| Add people, change roles, remove people | — | ✅ |
+| Rename the organization, set the logo, change the address | — | ✅ |
+
+The role lives in the users table beside the credentials, and every request
+reads it there rather than from the token — so a demotion or removal takes
+effect on the next request, not whenever a week-old JWT happens to expire.
+The organization's own facts (name, logo, who was invited and by whom) are
+events on its stream; the logo is stored as the event's blob, so there is no
+upload directory or object store.
+
 ## Architecture
 
 ### Components
@@ -102,6 +132,7 @@ original backend where the concept exists there):
 
 | Area | Events |
 |---|---|
+| Organization | `organization_named`, `organization_logo_set` (+ blob), `organization_logo_removed`, `member_invited`, `member_role_changed`, `member_removed`, `invitation_email_sent` |
 | Account / auth | `account_created`, `account_verification_code_issued`, `account_verification_email_sent`, `account_verified`, `password_reset_requested` / `_email_sent` / `_completed`, `owner_notified` |
 | Address + mailbox | `cargo_pax_email_identifier_assigned`, `mailbox_provisioned`, `mailbox_provision_failed`, `mailbox_deleted`, `welcome_email_sent` |
 | Forwarded emails | `email_message_received` (+ blob), `email_message_processed` |
@@ -290,17 +321,19 @@ npm test     # carrier mapping, tracking-number heuristic, email link extraction
 - `POST /api/auth/login` — `needsVerification: true` until verified
 - `POST /api/auth/change-password`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `GET /api/auth/me`
 
-### Commands (user, verified account)
+### Commands (admin of a verified organization)
 
 - `POST /api/commands/start-tracking-shipment` — `{ input, company? }` where `input` is a carrier link **or** a bare tracking number; 400 `reason: "ambiguous"` with `candidates` when the number fits more than one carrier
 - `POST /api/commands/update-tracking-shipment-label` — `{ trackerId, label }`
 - `POST /api/commands/delete-tracking-shipment` — `{ trackerId }`
-- `POST /api/commands/refresh-trackers`
+- `POST /api/commands/refresh-trackers` — **any member**, not just admins
 - `POST /api/commands/create-group` — `{ name }`
 - `POST /api/commands/assign-tracker-to-group` — `{ trackerId, groupId | null }`
 - `POST /api/commands/assign-cargo-pax-email-identifier` — `{ emailIdentifier }`
 - `POST /api/commands/register-push-subscription` / `remove-push-subscription` — this device's web push subscription
 - `POST /api/commands/send-test-push` — prove notifications reach the device
+- `POST /api/commands/invite-member` / `change-member-role` / `remove-member` (admin)
+- `POST /api/commands/name-organization` / `set-organization-logo` (multipart) / `remove-organization-logo` (admin)
 - `POST /api/commands/submit-feedback` (public, rate limited)
 
 ### Commands (background processor, API key)
@@ -312,7 +345,8 @@ npm test     # carrier mapping, tracking-number heuristic, email link extraction
 
 ### Queries
 
-- `GET /api/queries/account` — the dashboard view (403 + `needsVerification` until verified)
+- `GET /api/queries/account` — the dashboard view, including the organization, your role and the people in it (403 + `needsVerification` until verified)
+- `GET /api/queries/organization-logo` — the logo, to the organization's own people only
 - `GET /api/queries/mailbox-availability?localPart=` (public)
 - `GET /api/queries/push-config` (public) — the VAPID public key browsers subscribe with
 - `GET /api/queries/mailboxes-to-poll`, `email-messages-to-process`, `email-message-content`, `refresh-requests` (API key)

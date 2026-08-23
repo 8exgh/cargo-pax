@@ -1,16 +1,35 @@
 import Link from 'next/link';
 import { SITE_NAME } from '@/lib/site';
+import { OrganizationLogo } from '@/components/OrganizationLogo';
+import type { OrganizationView } from '@/types/queries';
 
-export function Header({ email, onLogout }: { email: string | null; onLogout?: () => void }) {
+export function Header({
+  email,
+  organization,
+  role,
+  onLogout
+}: {
+  email: string | null;
+  organization?: OrganizationView | null;
+  role?: 'admin' | 'member';
+  onLogout?: () => void;
+}) {
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3">
       <div className="max-w-3xl mx-auto flex justify-between items-center gap-4">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <img src="/logo.svg" alt="" className="h-7 w-7" />
-          <span className="text-lg font-semibold text-gray-900">{SITE_NAME}</span>
+        <Link href="/dashboard" className="flex items-center gap-2 min-w-0">
+          {organization ? (
+            <OrganizationLogo hasLogo={organization.hasLogo} version={organization.logoVersion} name={organization.name} />
+          ) : (
+            <img src="/logo.svg" alt="" className="h-7 w-7" />
+          )}
+          <span className="text-lg font-semibold text-gray-900 truncate">{organization?.name ?? SITE_NAME}</span>
+          {role === 'member' && (
+            <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded whitespace-nowrap">read only</span>
+          )}
         </Link>
         <div className="flex items-center gap-4 text-sm">
-          {email && <span className="text-gray-600 hidden sm:inline">{email}</span>}
+          {email && <span className="text-gray-600 hidden sm:inline truncate max-w-[16rem]">{email}</span>}
           <Link href="/settings" className="text-blue-600 hover:text-blue-800 hover:underline">
             Settings
           </Link>

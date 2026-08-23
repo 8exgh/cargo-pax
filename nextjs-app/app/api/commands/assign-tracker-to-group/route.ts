@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { requireVerifiedUser } from '@/lib/auth/middleware';
+import { requireVerifiedAdmin } from '@/lib/auth/middleware';
 import { serverError, unauthorized } from '@/lib/api/respond';
 import { handleAssignTrackerToGroup } from '@/lib/commands/account-commands';
 import { getLogger } from '@/lib/logger';
@@ -14,7 +14,7 @@ const Schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = requireVerifiedUser(request);
+    const auth = requireVerifiedAdmin(request);
     if (!auth.authenticated || !auth.tenantId) {
       return unauthorized(auth);
     }

@@ -179,19 +179,24 @@ export default function Dashboard() {
     );
   }
 
+  const isAdmin = account.you.role === 'admin';
   const visibleTracking = account.tracking.filter(t => groupFilter === 'all' || (t.groupId ?? 'none') === groupFilter);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header email={account.email} onLogout={handleLogout} />
+      <Header email={account.you.email} organization={account.organization} role={account.you.role} onLogout={handleLogout} />
       <div className="max-w-3xl mx-auto p-4 space-y-6">
         <ForwardingBanner account={account} />
 
-        <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">Or add one yourself</h2>
-          <p className="text-sm text-gray-500 mb-3">UPS, FedEx, Canada Post, Purolator, DHL, USPS.</p>
-          <TrackingInput onTrack={startTracking} busy={adding} error={actionError} />
-        </section>
+        {isAdmin ? (
+          <section className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Or add one yourself</h2>
+            <p className="text-sm text-gray-500 mb-3">UPS, FedEx, Canada Post, Purolator, DHL, USPS.</p>
+            <TrackingInput onTrack={startTracking} busy={adding} error={actionError} />
+          </section>
+        ) : (
+          actionError && <p className="p-3 bg-red-100 text-red-700 rounded text-sm">{actionError}</p>
+        )}
 
         <section className="bg-white rounded-lg shadow p-6">
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -225,13 +230,15 @@ export default function Dashboard() {
           {visibleTracking.length === 0 ? (
             <p className="text-gray-500 text-sm">
               {account.tracking.length === 0
+                ? isAdmin
                 ? 'Nothing on the way yet. Forward a shipment email to your address above, or paste a tracking link.'
+                : 'Nothing on the way yet. Anyone in the organization can forward a shipment email to the address above.'
                 : 'No shipments in this group.'}
             </p>
           ) : (
             <ul className="divide-y divide-gray-100">
               {visibleTracking.map(t => (
-                <TrackerRow key={t.trackerId} tracker={t} groups={account.groups} command={command} createGroup={createGroup} />
+                <TrackerRow key={t.trackerId} tracker={t} groups={account.groups} command={command} createGroup={createGroup} isAdmin={isAdmin} />
               ))}
             </ul>
           )}
@@ -242,7 +249,7 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold text-gray-900 mb-3">Delivered</h2>
             <ul className="divide-y divide-gray-100">
               {account.completedDeliveries.map(t => (
-                <TrackerRow key={t.trackerId} tracker={t} groups={account.groups} command={command} createGroup={createGroup} />
+                <TrackerRow key={t.trackerId} tracker={t} groups={account.groups} command={command} createGroup={createGroup} isAdmin={isAdmin} />
               ))}
             </ul>
           </section>
@@ -324,12 +331,14 @@ function TrackerRow({
   tracker,
   groups,
   command,
-  createGroup
+  createGroup,
+  isAdmin
 }: {
   tracker: TrackerView;
   groups: GroupView[];
   command: (path: string, body?: object) => Promise<{ ok: boolean; data: any }>;
   createGroup: () => Promise<string | null>;
+  isAdmin: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(tracker.label);
@@ -393,9 +402,11 @@ function TrackerRow({
           ) : (
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-medium text-gray-900">{tracker.label}</span>
-              <button onClick={() => { setDraft(tracker.label); setEditing(true); }} className="text-xs text-blue-600 hover:underline">
-                Edit
-              </button>
+              {isAdmin && (
+                <button onClick={() => { setDraft(tracker.label); setEditing(true); }} className="text-xs text-blue-600 hover:underline">
+                  Edit
+                </button>
+              )}
             </div>
           )}
           <div className="text-xs text-gray-500 mt-0.5">
@@ -428,6 +439,7 @@ function TrackerRow({
             </div>
           )}
         </div>
+        {isAdmin && (
         <div className="flex flex-col items-end gap-2 whitespace-nowrap">
           <select
             value={tracker.groupId ?? 'none'}
@@ -451,6 +463,7 @@ function TrackerRow({
             Delete
           </button>
         </div>
+        )}
       </div>
     </li>
   );

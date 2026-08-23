@@ -4,6 +4,38 @@ export interface CreateAccountCommand {
   email: string;
   emailIdentifier: string;
   mailboxDomain: string;
+  organizationName: string;
+}
+
+export interface NameOrganizationCommand {
+  name: string;
+}
+
+export interface SetOrganizationLogoCommand {
+  mimeType: string;
+  filename: string;
+  bytes: Buffer;
+}
+
+export interface InviteMemberCommand {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member';
+  invitedBy: string;
+  temporaryPassword: string;
+}
+
+export interface ChangeMemberRoleCommand {
+  userId: string;
+  email: string;
+  role: 'admin' | 'member';
+  changedBy: string;
+}
+
+export interface RemoveMemberCommand {
+  userId: string;
+  email: string;
+  removedBy: string;
 }
 
 export interface IssueVerificationCodeCommand {

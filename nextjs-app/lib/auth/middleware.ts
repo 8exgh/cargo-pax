@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { verifyToken } from './jwt';
 import { getLogger } from '@/lib/logger';
 import { getAccountState } from '@/lib/queries/account-queries';
+import { getUserById } from '@/lib/db/system';
 
 const log = getLogger('auth/middleware');
 
@@ -41,11 +42,20 @@ export function authenticateRequest(request: NextRequest): AuthResult {
   const payload = verifyToken(token);
 
   if (payload && payload.userId && payload.tenantId) {
+    /* The token says who you are; the users table says what you may do and
+       whether you are still here. Reading the role from the token would
+       leave a demoted or removed person with their old powers until it
+       expired - up to a week. One indexed lookup is worth that. */
+    const user = getUserById(payload.userId);
+    if (!user || user.tenant_id !== payload.tenantId) {
+      log.debug('Auth failed: the user no longer exists in that organization');
+      return { authenticated: false, error: 'Your access to this organization has been removed' };
+    }
     return {
       authenticated: true,
-      userId: payload.userId,
-      tenantId: payload.tenantId,
-      role: payload.role,
+      userId: user.id,
+      tenantId: user.tenant_id,
+      role: user.role,
       isApiKey: false
     };
   }
@@ -86,6 +96,23 @@ export function requireApiKey(request: NextRequest): AuthResult {
   }
 
   return { authenticated: true, isApiKey: true };
+}
+
+/* Two gates for people. Everyone in a verified organization can read, and
+   can ask for a refresh - that is deliberately not an admin action, because
+   "is my parcel moving yet" is the whole point of the product. Everything
+   that changes what the organization tracks, who is in it, or who it is,
+   needs an admin. */
+
+export function requireVerifiedAdmin(request: NextRequest): AuthResult {
+  const auth = requireVerifiedUser(request);
+  if (!auth.authenticated) {
+    return auth;
+  }
+  if (auth.role !== 'admin') {
+    return { authenticated: false, error: 'Only an admin can do that' };
+  }
+  return auth;
 }
 
 // User routes that touch the account require a verified email, like the
