@@ -158,6 +158,11 @@ async function run(): Promise<MailDomainStatus> {
     // 3. Migadu re-checks DNS and flips the domain live.
     const activation = await activateDomain(domain);
     if (!activation.ok) {
+      // Migadu's own words about what is still missing beat any guess we
+      // could make from here, so they go straight into the status.
+      const said = typeof activation.data === 'string'
+        ? activation.data
+        : JSON.stringify(activation.data ?? {});
       const where = onCloudflare === true
         ? 'records were written to Cloudflare but have not propagated yet'
         : cloudflareConfigured()
@@ -165,7 +170,7 @@ async function run(): Promise<MailDomainStatus> {
           : 'no DNS provider is configured (set CLOUDFLARE_API_TOKEN, or publish the records by hand)';
       return settle({
         stage: 'awaiting_dns',
-        detail: `Migadu has not verified the domain yet (${activation.status}); ${where}`,
+        detail: `Migadu has not verified the domain yet (${activation.status}): ${said.slice(0, 400)}; ${where}`,
         requiredRecords: required,
         dnsProvider
       });
