@@ -3,14 +3,34 @@
 GET {{host}}/api/queries/account
 Authorization: Bearer {{token}}
 
-### Paste a carrier url (carrier + tracking number are read off it; a
-### refresh is requested right away)
+### Paste a carrier url (its host names the carrier; a refresh is requested
+### right away)
 POST {{host}}/api/commands/start-tracking-shipment
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "url": "https://www.ups.com/track?tracknum=1Z999AA10123456784"
+  "input": "https://www.ups.com/track?tracknum=1Z999AA10123456784"
+}
+
+### ...or just the tracking number: unique formats identify themselves
+POST {{host}}/api/commands/start-tracking-shipment
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "input": "1Z999AA10123456784"
+}
+
+### ...and overlapping ones (12 digits is FedEx or Purolator) take a choice.
+### Without "company" this answers 400 with reason "ambiguous" + candidates.
+POST {{host}}/api/commands/start-tracking-shipment
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "input": "123456789012",
+  "company": "purolator"
 }
 
 ### Give it a description

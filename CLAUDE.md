@@ -45,7 +45,8 @@ scale).
 - `nextjs-app/lib/commands/event-replay.ts` — the fold
 - `nextjs-app/lib/commands/account-commands.ts` — all command handlers; `aggregate_id = tenantId`; `handleUpdateTrackingShipmentStatus` appends only changed dates, delivered last
 - `nextjs-app/lib/queries/account-queries.ts` — dashboard view, the processor's to-dos (`getRefreshRequests`, `getMailboxesToPoll`, `getEmailMessagesToProcess`, `getEmailMessageContent`), the jobs' to-dos, `isAllowedTrackingUrl`
-- `nextjs-app/lib/tracking/carrier.ts` — carrier domain map + tracking-number heuristic (mirrored in `background-processor/src/utils/carrier.ts`; keep in sync)
+- `nextjs-app/lib/tracking/carrier.ts` — carrier domain map, per-carrier tracking-number formats, and `carriersForTrackingNumber` (mirrored in `background-processor/src/utils/carrier.ts`; keep in sync)
+- `nextjs-app/lib/tracking/tracking-input.ts` + `components/TrackingInput.tsx` — the dashboard box takes a link or a bare number: the carrier is detected and the dropdown selects itself, overlapping formats ask the user, and a link's host always beats the dropdown
 - `nextjs-app/lib/jobs.ts` — the in-process jobs (8examples "pump"): verification / welcome / owner / shipment-update / reset emails, mailbox provisioning and retired-mailbox deletion
 - `nextjs-app/lib/mail.ts` — Gmail SMTP (nodemailer), `notifyOwner` → `NOTIFY_EMAIL` (sbennett@8examples.com)
 - `nextjs-app/lib/migadu.ts`, `lib/mailbox.ts` — Migadu adapter (mailboxes + domain endpoints, `parseMigaduRecords`); address rules, reserved list, availability check

@@ -6,7 +6,9 @@ CargoPax follows every package for you. It picks the carrier tracking links
 renders the tracking page in a headless browser, has a language model read
 the journey off it (label created, on the way, out for delivery, delivered,
 estimated date), and emails you as the package moves. You can paste a
-tracking link by hand too.
+tracking link by hand too — or just the tracking number: the carrier is
+identified from the number's format, and a dropdown (which fills itself in)
+settles the cases where formats overlap.
 
 This is the [8exgh/cargopax](https://github.com/8exgh/cargopax) product
 rebuilt on the `starter-sites` / `inventory-shopify` stack: Next.js,
@@ -164,6 +166,12 @@ API (`ShipmentJourneySchema`; ISO dates; today's date in the prompt). The
 same model names each emailed shipment ("Lee Valley via UPS for Jane").
 Model is `OPENAI_MODEL`; `gpt-5-mini` or `gpt-5.6-luna` are cheaper.
 
+A number typed straight into the dashboard is matched against those same
+formats (`lib/tracking/tracking-input.ts`): one match builds the carrier's
+tracking url, several (12 digits is FedEx or Purolator) ask the user to pick,
+and a pasted link always wins over the dropdown because its host is
+authoritative.
+
 Only known carrier hosts are ever loaded in the browser (the SSRF guard;
 `TRACKING_ALLOWED_HOSTS` overrides for local fixtures). A link in a
 forwarded email is tracked only when its host is a carrier **and** it
@@ -262,7 +270,7 @@ npm test     # carrier mapping, tracking-number heuristic, email link extraction
 
 ### Commands (user, verified account)
 
-- `POST /api/commands/start-tracking-shipment` — `{ url }`
+- `POST /api/commands/start-tracking-shipment` — `{ input, company? }` where `input` is a carrier link **or** a bare tracking number; 400 `reason: "ambiguous"` with `candidates` when the number fits more than one carrier
 - `POST /api/commands/update-tracking-shipment-label` — `{ trackerId, label }`
 - `POST /api/commands/delete-tracking-shipment` — `{ trackerId }`
 - `POST /api/commands/refresh-trackers`

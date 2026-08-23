@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Spinner } from '@/components/Spinner';
 import { ShipmentJourney } from '@/components/ShipmentJourney';
+import { TrackingInput } from '@/components/TrackingInput';
+import type { DeliveryCompany } from '@/types/events';
 import type { AccountView, GroupView, TrackerView } from '@/types/queries';
 
 const POLL_FAST_MS = 4000; // while a refresh or the inbox setup is pending
@@ -20,7 +22,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState('');
   const [actionError, setActionError] = useState('');
-  const [newUrl, setNewUrl] = useState('');
   const [adding, setAdding] = useState(false);
   const [refreshingAll, setRefreshingAll] = useState(false);
   const [groupFilter, setGroupFilter] = useState<string>('all');
@@ -117,16 +118,9 @@ export default function Dashboard() {
     }
   }
 
-  async function startTracking(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newUrl.trim()) {
-      return;
-    }
+  async function startTracking(input: string, company: DeliveryCompany | null) {
     setAdding(true);
-    const { ok } = await command('/api/commands/start-tracking-shipment', { url: newUrl.trim() });
-    if (ok) {
-      setNewUrl('');
-    }
+    await command('/api/commands/start-tracking-shipment', { input, company });
     setAdding(false);
   }
 
@@ -179,27 +173,9 @@ export default function Dashboard() {
         <ForwardingBanner account={account} />
 
         <section className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">Or paste a tracking link</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-1">Or add one yourself</h2>
           <p className="text-sm text-gray-500 mb-3">UPS, FedEx, Canada Post, Purolator, DHL, USPS.</p>
-          <form onSubmit={startTracking} className="flex flex-col sm:flex-row gap-2">
-            <input
-              type="url"
-              value={newUrl}
-              onChange={(e) => setNewUrl(e.target.value)}
-              placeholder="https://www.ups.com/track?tracknum=…"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-            />
-            <button
-              type="submit"
-              disabled={adding || !newUrl.trim()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-gray-400 whitespace-nowrap"
-            >
-              {adding ? 'Adding…' : 'Track'}
-            </button>
-          </form>
-          {actionError && (
-            <p className="mt-3 p-3 bg-red-100 text-red-700 rounded text-sm">{actionError}</p>
-          )}
+          <TrackingInput onTrack={startTracking} busy={adding} error={actionError} />
         </section>
 
         <section className="bg-white rounded-lg shadow p-6">

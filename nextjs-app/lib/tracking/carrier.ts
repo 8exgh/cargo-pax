@@ -87,6 +87,30 @@ export function isTrackingNumberForCompany(company: DeliveryCompany, value: stri
   return GENERIC_TRACKING_NUMBER.test(candidate);
 }
 
+/* Which carriers a bare tracking number could belong to. Formats overlap
+   (12 digits is FedEx or Purolator; 20-22 digits is FedEx, USPS or UPS
+   Mail Innovations), so this returns every candidate and lets the caller
+   decide - the UI asks the user when the answer is not exactly one. */
+export function carriersForTrackingNumber(value: string): DeliveryCompany[] {
+  const candidate = normalizeTrackingNumberInput(value);
+  if (!candidate) {
+    return [];
+  }
+  return (Object.keys(TRACKING_NUMBER_PATTERNS) as DeliveryCompany[])
+    .filter(company => isTrackingNumberForCompany(company, candidate));
+}
+
+/* People paste numbers with the spaces and dashes the carrier printed. */
+export function normalizeTrackingNumberInput(value: string): string {
+  return value.replace(/[\s-]/g, '').trim().toUpperCase();
+}
+
+/* Does this input look like a url rather than a tracking number? */
+export function looksLikeUrl(value: string): boolean {
+  const v = value.trim();
+  return /^https?:\/\//i.test(v) || /^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|\?|$)/i.test(v);
+}
+
 // Scores how much a token looks like an English word (vowel ratio, camel
 // case, digits). The tracking number is the least English-looking token.
 export function englishLikenessScore(str: string): number {
