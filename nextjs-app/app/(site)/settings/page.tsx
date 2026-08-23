@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Spinner } from '@/components/Spinner';
 import type { AccountView } from '@/types/queries';
+import { PushNotifications } from '@/components/PushNotifications';
 
 function normalizeLocalPart(raw: string): string {
   return raw.toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 40);
@@ -227,6 +228,8 @@ export default function Settings() {
             )}
           </section>
         )}
+
+        <PushNotifications endpoints={account.pushEndpoints} />
 
         <section className="bg-white rounded-lg shadow p-6 text-sm text-gray-700 space-y-2">
           <h2 className="text-lg font-semibold text-gray-900">Account</h2>

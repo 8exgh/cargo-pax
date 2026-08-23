@@ -54,6 +54,9 @@ export interface EmailMessageView {
 export interface AccountView {
   email: string;
   verified: boolean;
+  // Endpoints this account has registered, so the UI can tell whether *this*
+  // device is already subscribed
+  pushEndpoints: string[];
   mailbox: MailboxView | null;
   forwardingAddress: string | null;
   groups: GroupView[];
@@ -148,6 +151,22 @@ export interface ShipmentNotificationTask {
   trackingNumber: string;
   changes: ShipmentChange[];
   errorMessage: string | null;
+}
+
+export interface PushSubscriptionView {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+}
+
+export interface PushNotificationTask {
+  tenantId: string;
+  trackerId: string;
+  label: string;
+  companyLabel: string;
+  trackingNumber: string;
+  changes: ShipmentChange[];
+  subscriptions: PushSubscriptionView[];
 }
 
 export interface PasswordResetEmailTask {

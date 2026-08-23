@@ -49,6 +49,7 @@ scale).
 - `nextjs-app/lib/tracking/tracking-input.ts` + `components/TrackingInput.tsx` — the dashboard box takes a link or a bare number: the carrier is detected and the dropdown selects itself, overlapping formats ask the user, and a link's host always beats the dropdown
 - `nextjs-app/lib/jobs.ts` — the in-process jobs (8examples "pump"): verification / welcome / owner / shipment-update / reset emails, mailbox provisioning and retired-mailbox deletion
 - `nextjs-app/lib/mail.ts` — Gmail SMTP (nodemailer), `notifyOwner` → `NOTIFY_EMAIL` (sbennett@8examples.com)
+- `nextjs-app/lib/push.ts` + `public/sw.js` + `components/PushNotifications.tsx` — web push (VAPID, `VAPID_*` env). Subscriptions are events (`web_push_subscription_registered`/`_removed`, the original's device-registration shape); trackers keep a separate `pendingPushChanges` list so push and email never eat each other's work; a 404/410 from the push service drops the subscription. iOS only delivers to a Home Screen install, so the UI shows install steps to iOS-in-a-tab rather than a dead button.
 - `nextjs-app/lib/migadu.ts`, `lib/mailbox.ts` — Migadu adapter (mailboxes + domain endpoints, `parseMigaduRecords`); address rules, reserved list, availability check
 - `nextjs-app/lib/mail-domain.ts` + `lib/cloudflare.ts` — converges MAIL_DOMAIN on Migadu each pump (add domain → read required DNS → publish to Cloudflare when the zone is ours → activate), caches for 6h, and reports the records to publish by hand otherwise (`GET /api/queries/mail-domain?recheck=1`). Ported from 8examples' `ensureMailboxDns`/`createZoneRecords`.
 - `nextjs-app/lib/auth/middleware.ts` — `requireAuth`, `requireApiKey`, `requireVerifiedUser` (403 + `needsVerification`)
@@ -59,6 +60,7 @@ scale).
 Conventions worth keeping:
 
 - Event names are snake_case and follow the original cargopax backend where a concept exists there.
+- Web push needs no Apple/Firebase accounts, just the VAPID keypair in devops (`CARGO_PAX_VAPID_*`); `app/manifest.ts` + `public/icon-*.png` exist so the iOS Home Screen install looks right, and `send-test-push` is how you confirm an install took.
 - Outbound side effects always pair with a marker event; a failed send leaves no marker and retries on the next pump. Shipment-update emails batch every pending change per tracker and wait until its scrape completes.
 - Mailbox passwords, verification codes and reset tokens are stored in events in plaintext (owner decision, same as 8examples). Codes/tokens are single-use and expire.
 - Only carrier hosts (or `TRACKING_ALLOWED_HOSTS`) are ever loaded in the browser; email-found links must be on a carrier host and carry a token in that carrier's real tracking-number format (`TRACKING_NUMBER_PATTERNS` in `carrier.ts`). A pasted url still gets a best-effort number when nothing matches.

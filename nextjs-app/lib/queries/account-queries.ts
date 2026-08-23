@@ -14,6 +14,7 @@ import {
   OwnerNotificationTask,
   PasswordResetEmailTask,
   PasswordResetLookup,
+  PushNotificationTask,
   ShipmentNotificationTask,
   TrackerRefreshRequest,
   TrackerView,
@@ -101,6 +102,7 @@ export function getAccountView(tenantId: string): AccountView | null {
   return {
     email: state.email!,
     verified: state.verified,
+    pushEndpoints: state.pushSubscriptions.map(p => p.endpoint),
     mailbox: state.mailbox
       ? {
           address: `${state.mailbox.localPart}@${state.mailbox.domain}`,
@@ -333,6 +335,33 @@ export function getShipmentNotificationsToSend(): ShipmentNotificationTask[] {
         trackingNumber: tracker.trackingNumber,
         changes: [...tracker.pendingChanges],
         errorMessage: tracker.errorMessage
+      });
+    }
+  }
+  return tasks;
+}
+
+// Trackers with changes nobody has been pushed about yet, for accounts that
+// have at least one subscribed device. Mirrors the email query but keeps its
+// own pending list, so a push failure never eats an email and vice versa.
+export function getPushNotificationsToSend(): PushNotificationTask[] {
+  const tasks: PushNotificationTask[] = [];
+  for (const { tenantId, state } of accountStates()) {
+    if (!state.verified || state.pushSubscriptions.length === 0) {
+      continue;
+    }
+    for (const tracker of state.trackers) {
+      if (tracker.pendingPushChanges.length === 0 || tracker.refreshRequested) {
+        continue;
+      }
+      tasks.push({
+        tenantId,
+        trackerId: tracker.trackerId,
+        label: tracker.label,
+        companyLabel: COMPANY_LABELS[tracker.deliveryCompany] ?? COMPANY_LABELS.unknown,
+        trackingNumber: tracker.trackingNumber,
+        changes: [...tracker.pendingPushChanges],
+        subscriptions: state.pushSubscriptions.map(p => ({ endpoint: p.endpoint, p256dh: p.p256dh, auth: p.auth }))
       });
     }
   }

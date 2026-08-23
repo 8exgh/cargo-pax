@@ -114,3 +114,21 @@ export interface RecordPasswordResetEmailSentCommand {
 export interface CompletePasswordResetCommand {
   requestId: string;
 }
+
+export interface RegisterWebPushSubscriptionCommand {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent: string;
+}
+
+export interface RemoveWebPushSubscriptionCommand {
+  endpoint: string;
+  reason: 'user' | 'expired';
+}
+
+export interface RecordPushNotificationSentCommand {
+  trackerId: string;
+  endpoints: string[];
+  changes: { changeType: string; date: string }[];
+}

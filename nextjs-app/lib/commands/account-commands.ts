@@ -18,6 +18,9 @@ import {
   RecordMailboxProvisionFailedCommand,
   RecordMailboxProvisionedCommand,
   RecordPasswordResetEmailSentCommand,
+  RecordPushNotificationSentCommand,
+  RegisterWebPushSubscriptionCommand,
+  RemoveWebPushSubscriptionCommand,
   RequestPasswordResetCommand,
   StartTrackingShipmentCommand,
   UpdateTrackingShipmentLabelCommand,
@@ -503,6 +506,49 @@ export function handleRecordEmailNotificationSent(tenantId: string, command: Rec
   append(tenantId, version, 'email_notification_sent', {
     trackerId: command.trackerId,
     to: command.to,
+    changes: command.changes as ShipmentChange[]
+  });
+}
+
+export function handleRegisterWebPushSubscription(tenantId: string, command: RegisterWebPushSubscriptionCommand): void {
+  const { state, version } = load(tenantId);
+  requireCreated(state);
+
+  const existing = state.pushSubscriptions.find(p => p.endpoint === command.endpoint);
+  if (existing && existing.p256dh === command.p256dh && existing.auth === command.auth) {
+    return; // the same device asking again is not a change
+  }
+
+  append(tenantId, version, 'web_push_subscription_registered', {
+    endpoint: command.endpoint,
+    p256dh: command.p256dh,
+    auth: command.auth,
+    userAgent: command.userAgent.slice(0, 300)
+  });
+}
+
+export function handleRemoveWebPushSubscription(tenantId: string, command: RemoveWebPushSubscriptionCommand): void {
+  const { state, version } = load(tenantId);
+  if (!state.pushSubscriptions.some(p => p.endpoint === command.endpoint)) {
+    return; // already gone
+  }
+
+  append(tenantId, version, 'web_push_subscription_removed', {
+    endpoint: command.endpoint,
+    reason: command.reason
+  });
+}
+
+export function handleRecordPushNotificationSent(tenantId: string, command: RecordPushNotificationSentCommand): void {
+  const { state, version } = load(tenantId);
+  const tracker = requireTracker(state, command.trackerId);
+  if (tracker.pendingPushChanges.length === 0) {
+    throw new Error('No pending push changes for that tracker');
+  }
+
+  append(tenantId, version, 'push_notification_sent', {
+    trackerId: command.trackerId,
+    endpoints: command.endpoints,
     changes: command.changes as ShipmentChange[]
   });
 }

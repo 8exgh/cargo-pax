@@ -25,6 +25,9 @@ import {
   handleRecordWelcomeEmailSent
 } from '@/lib/commands/account-commands';
 import { ShipmentChange, ShipmentChangeType } from '@/types/events';
+import { notificationTitle, pushConfigured, sendPush } from '@/lib/push';
+import { getPushNotificationsToSend } from '@/lib/queries/account-queries';
+import { handleRecordPushNotificationSent, handleRemoveWebPushSubscription } from '@/lib/commands/account-commands';
 
 /* The in-process background jobs (the 8examples "pump" pattern): each job
    is a query for work that has no completion marker yet, does the side
@@ -68,6 +71,7 @@ async function runJobs(): Promise<void> {
   await sendWelcomeEmails();
   await notifyOwnerOfSignups();
   await sendShipmentNotifications();
+  await sendPushNotifications();
   await sendPasswordResetEmails();
 }
 
@@ -280,6 +284,54 @@ async function sendShipmentNotifications(): Promise<void> {
       }
     } catch (error: any) {
       log.error(`Shipment notification to ${task.email} failed:`, error);
+    }
+  }
+}
+
+/* One push per tracker per device, with the same batch of changes the email
+   carries. A subscription the push service rejects as gone is forgotten, so
+   dead devices do not accumulate. */
+async function sendPushNotifications(): Promise<void> {
+  if (!pushConfigured()) {
+    return;
+  }
+  for (const task of getPushNotificationsToSend()) {
+    const delivered = task.changes.some(c => c.changeType === 'shipmentDelivered');
+    const lines = describeChanges(task.changes).map(l => l.replace(/^- /, ''));
+    const payload = {
+      title: notificationTitle(delivered, task.label),
+      body: lines.join('\n'),
+      tag: task.trackerId
+    };
+
+    const reached: string[] = [];
+    for (const subscription of task.subscriptions) {
+      const outcome = await sendPush(subscription, payload);
+      if (outcome === 'sent') {
+        reached.push(subscription.endpoint);
+      } else if (outcome === 'expired') {
+        try {
+          handleRemoveWebPushSubscription(task.tenantId, { endpoint: subscription.endpoint, reason: 'expired' });
+          log.info(`Dropped an expired push subscription for tenant ${task.tenantId}`);
+        } catch (error: any) {
+          log.error('Could not drop an expired push subscription:', error);
+        }
+      }
+    }
+
+    // Only mark the changes pushed if at least one device actually got them;
+    // otherwise they stay pending and the next pump tries again.
+    if (reached.length > 0) {
+      try {
+        handleRecordPushNotificationSent(task.tenantId, {
+          trackerId: task.trackerId,
+          endpoints: reached,
+          changes: task.changes
+        });
+        log.info(`Pushed ${task.changes.length} change(s) for ${task.trackerId} to ${reached.length} device(s)`);
+      } catch (error: any) {
+        log.error(`Could not record push for ${task.trackerId}:`, error);
+      }
     }
   }
 }

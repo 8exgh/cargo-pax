@@ -21,7 +21,7 @@ and **no AWS**. What the original did with AWS is done here as:
 | Inbound email: SES → S3 → Lambda → Postgres | Each account gets a real Migadu mailbox; the processor polls it over IMAP |
 | Raw emails in S3 | Parsed body stored as the `email_message_received` event's blob (SQLite) |
 | SES outbound + SES identity verification | Gmail SMTP (nodemailer); notifications go to the verified account email |
-| Apple / Android push | Not ported (no mobile app in this repo); email notifications only |
+| Apple / Android push (APNs + FCM, native app) | **Web push** instead: browsers, installed PWAs, and iPhone/iPad once added to the Home Screen - one VAPID keypair, no Apple certificates or Firebase project |
 | TypeChat + GPT-3.5, five questions per page | OpenAI structured outputs, one call per page (`gpt-5.4-mini`) |
 | Postgres event store | SQLite, one event store per account |
 
@@ -126,6 +126,28 @@ Jobs: verification email, inbox provisioning and retired-inbox deletion
 (Migadu), welcome email, owner notification (sbennett@8examples.com),
 shipment-update emails (one per tracker with every change since the last,
 held until the tracker's scrape completes), password reset email.
+
+### Notifications
+
+Two channels, tracked separately so a failure in one never silences the
+other: an **email** per tracker with everything that changed, and a **web
+push** carrying the same batch (`lib/push.ts`, `public/sw.js`). Each tracker
+keeps its own pending list per channel, cleared by `email_notification_sent`
+and `push_notification_sent` respectively.
+
+Devices subscribe from Settings; subscriptions live in the account stream as
+`web_push_subscription_registered` / `_removed`, which is the shape the
+original used for `apple_device_registered` / `_unregistered`. A subscription
+the push service reports as gone (404/410) is dropped automatically. When a
+push arrives the service worker also nudges any open tab to refresh, so the
+dashboard is current behind the notification.
+
+**iPhone and iPad:** Apple only delivers web push to a site added to the Home
+Screen - never from a Safari tab - so the Settings page detects iOS-in-a-tab
+and shows the Add to Home Screen steps instead of a button that cannot work.
+The manifest (`app/manifest.ts`) and icons exist to make that install look
+right. `POST /api/commands/send-test-push` sends a test notification, which
+is the only way to be certain an iOS install took.
 
 ### Email
 
@@ -277,6 +299,8 @@ npm test     # carrier mapping, tracking-number heuristic, email link extraction
 - `POST /api/commands/create-group` — `{ name }`
 - `POST /api/commands/assign-tracker-to-group` — `{ trackerId, groupId | null }`
 - `POST /api/commands/assign-cargo-pax-email-identifier` — `{ emailIdentifier }`
+- `POST /api/commands/register-push-subscription` / `remove-push-subscription` — this device's web push subscription
+- `POST /api/commands/send-test-push` — prove notifications reach the device
 - `POST /api/commands/submit-feedback` (public, rate limited)
 
 ### Commands (background processor, API key)
@@ -290,6 +314,7 @@ npm test     # carrier mapping, tracking-number heuristic, email link extraction
 
 - `GET /api/queries/account` — the dashboard view (403 + `needsVerification` until verified)
 - `GET /api/queries/mailbox-availability?localPart=` (public)
+- `GET /api/queries/push-config` (public) — the VAPID public key browsers subscribe with
 - `GET /api/queries/mailboxes-to-poll`, `email-messages-to-process`, `email-message-content`, `refresh-requests` (API key)
 - `GET /api/queries/mail-domain` — mail-domain convergence state and any DNS records still to publish (API key)
 - `GET /api/queries/feedback`

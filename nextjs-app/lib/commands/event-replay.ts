@@ -10,11 +10,13 @@ function findTracker(state: AccountState, trackerId: string): Tracker | undefine
 // repeat of the same type (a re-scrape) just refreshes the date, the way
 // the original applyEmailNotification did.
 function addPendingChange(tracker: Tracker, changeType: ShipmentChangeType, date: string): void {
-  const existing = tracker.pendingChanges.find(c => c.changeType === changeType);
-  if (existing) {
-    existing.date = date;
-  } else {
-    tracker.pendingChanges.push({ changeType, date });
+  for (const pending of [tracker.pendingChanges, tracker.pendingPushChanges]) {
+    const existing = pending.find(c => c.changeType === changeType);
+    if (existing) {
+      existing.date = date;
+    } else {
+      pending.push({ changeType, date });
+    }
   }
 }
 
@@ -35,7 +37,8 @@ export function replayEvents(events: Event[]): AccountState {
     emailMessages: [],
     groups: [],
     trackers: [],
-    passwordResets: []
+    passwordResets: [],
+    pushSubscriptions: []
   };
 
   for (const event of events) {
@@ -188,7 +191,8 @@ export function replayEvents(events: Event[]): AccountState {
           refreshRequested: null,
           errorMessage: null,
           startedAt: event.timestamp,
-          pendingChanges: []
+          pendingChanges: [],
+          pendingPushChanges: []
         };
         addPendingChange(tracker, 'trackingHasStarted', isoDate(event.timestamp));
         state.trackers.push(tracker);
@@ -275,6 +279,40 @@ export function replayEvents(events: Event[]): AccountState {
       case 'shipment_tracker_deleted':
         state.trackers = state.trackers.filter(t => t.trackerId !== data.trackerId);
         break;
+
+      case 'web_push_subscription_registered': {
+        const existing = state.pushSubscriptions.find(p => p.endpoint === data.endpoint);
+        if (existing) {
+          // The browser re-issued the same endpoint with fresh keys
+          existing.p256dh = data.p256dh;
+          existing.auth = data.auth;
+          existing.userAgent = data.userAgent;
+        } else {
+          state.pushSubscriptions.push({
+            endpoint: data.endpoint,
+            p256dh: data.p256dh,
+            auth: data.auth,
+            userAgent: data.userAgent,
+            registeredAt: event.timestamp
+          });
+        }
+        break;
+      }
+
+      case 'web_push_subscription_removed':
+        state.pushSubscriptions = state.pushSubscriptions.filter(p => p.endpoint !== data.endpoint);
+        break;
+
+      case 'push_notification_sent': {
+        const tracker = findTracker(state, data.trackerId);
+        if (tracker) {
+          const sent = (data.changes ?? []) as ShipmentChange[];
+          tracker.pendingPushChanges = tracker.pendingPushChanges.filter(
+            p => !sent.some(s => s.changeType === p.changeType && s.date === p.date)
+          );
+        }
+        break;
+      }
 
       case 'email_notification_sent': {
         const tracker = findTracker(state, data.trackerId);

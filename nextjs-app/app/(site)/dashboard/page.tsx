@@ -76,6 +76,21 @@ export default function Dashboard() {
     loadAccount();
   }, [loadAccount, router]);
 
+  // A push means something changed; pull the new state in behind the
+  // notification rather than waiting for the next poll.
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) {
+      return;
+    }
+    const onMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'cargopax-push') {
+        loadAccount();
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMessage);
+    return () => navigator.serviceWorker.removeEventListener('message', onMessage);
+  }, [loadAccount]);
+
   // Poll quickly while something is in flight, slowly otherwise
   useEffect(() => {
     if (pollTimer.current) {

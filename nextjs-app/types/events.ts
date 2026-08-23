@@ -40,7 +40,10 @@ export type EventType =
   | 'shipment_tracker_error_cleared'
   | 'shipment_tracker_deleted'
   // notifications
-  | 'email_notification_sent';
+  | 'email_notification_sent'
+  | 'web_push_subscription_registered'
+  | 'web_push_subscription_removed'
+  | 'push_notification_sent';
 
 export type DeliveryCompany = 'ups' | 'fedex' | 'usps' | 'dhl' | 'canada_post' | 'purolator' | 'priority1' | 'unknown';
 
@@ -185,6 +188,27 @@ export interface EmailNotificationSentData {
   changes: ShipmentChange[];
 }
 
+/* A browser/PWA push subscription. Takes the place of the original's
+   apple_device_registered / android_device_registered: one row per device
+   that asked for notifications, keyed by the push service endpoint. */
+export interface WebPushSubscriptionRegisteredData {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent: string;
+}
+
+export interface WebPushSubscriptionRemovedData {
+  endpoint: string;
+  reason: 'user' | 'expired';
+}
+
+export interface PushNotificationSentData {
+  trackerId: string;
+  endpoints: string[];
+  changes: ShipmentChange[];
+}
+
 // Matches database columns with snake case
 export interface Event {
   id: number;
@@ -202,6 +226,14 @@ export interface RefreshRequest {
   priority: number;
   requestedAt: number;
   eventId: number;
+}
+
+export interface PushSubscription {
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  userAgent: string;
+  registeredAt: number;
 }
 
 export interface Tracker {
@@ -223,6 +255,9 @@ export interface Tracker {
   startedAt: number;
   // Status changes not yet emailed to the user
   pendingChanges: ShipmentChange[];
+  // ...and not yet pushed. Tracked separately so a failure on one channel
+  // never silences the other.
+  pendingPushChanges: ShipmentChange[];
 }
 
 export interface Group {
@@ -290,4 +325,5 @@ export interface AccountState {
   groups: Group[];
   trackers: Tracker[];
   passwordResets: PasswordReset[];
+  pushSubscriptions: PushSubscription[];
 }
