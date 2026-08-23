@@ -1,0 +1,56 @@
+### The dashboard's read: forwarding address, groups, trackers with their
+### journey, delivered packages, recent forwarded emails
+GET {{host}}/api/queries/account
+Authorization: Bearer {{token}}
+
+### Paste a carrier url (carrier + tracking number are read off it; a
+### refresh is requested right away)
+POST {{host}}/api/commands/start-tracking-shipment
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "url": "https://www.ups.com/track?tracknum=1Z999AA10123456784"
+}
+
+### Give it a description
+POST {{host}}/api/commands/update-tracking-shipment-label
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "trackerId": "{{trackerId}}",
+  "label": "New keyboard"
+}
+
+### Groups
+POST {{host}}/api/commands/create-group
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Gifts"
+}
+
+### Put a tracker in a group (groupId null removes it)
+POST {{host}}/api/commands/assign-tracker-to-group
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "trackerId": "{{trackerId}}",
+  "groupId": "{{groupId}}"
+}
+
+### Refresh every undelivered tracker
+POST {{host}}/api/commands/refresh-trackers
+Authorization: Bearer {{token}}
+
+### Delete a tracker
+POST {{host}}/api/commands/delete-tracking-shipment
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "trackerId": "{{trackerId}}"
+}

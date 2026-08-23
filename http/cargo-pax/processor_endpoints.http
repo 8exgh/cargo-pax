@@ -1,0 +1,83 @@
+### --- Inbox poll: every provisioned @cargopax.ca mailbox with IMAP creds
+### and the last uid recorded (API key auth)
+GET {{host}}/api/queries/mailboxes-to-poll
+X-API-Key: {{apiKey}}
+
+### What the poll posts for each new message (body kept as the event's blob)
+POST {{host}}/api/commands/record-email-message-received
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "tenantId": "{{tenantId}}",
+  "messageId": "<order-48213@shop.example>",
+  "uid": 7,
+  "uidValidity": 1001,
+  "subject": "Fwd: Your order has shipped",
+  "from": "Jane <jane@example.com>",
+  "to": "jane@cargopax.ca",
+  "receivedAt": 1787490000000,
+  "text": "Track it: https://www.ups.com/track?tracknum=1Z999AA10123456784",
+  "html": ""
+}
+
+### --- Email processing: forwarded emails not yet read for tracking links
+GET {{host}}/api/queries/email-messages-to-process
+X-API-Key: {{apiKey}}
+
+### The message body
+GET {{host}}/api/queries/email-message-content?tenantId={{tenantId}}&messageId=%3Corder-48213%40shop.example%3E
+X-API-Key: {{apiKey}}
+
+### A tracker started from an email (409 if that shipment is already tracked)
+POST {{host}}/api/commands/start-tracking-shipment
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "tenantId": "{{tenantId}}",
+  "url": "https://www.ups.com/track?tracknum=1Z999AA10123456784",
+  "shipmentCompany": "ups",
+  "trackingNumber": "1Z999AA10123456784",
+  "label": "Lee Valley via UPS for Jane",
+  "messageId": "<order-48213@shop.example>"
+}
+
+### Done with the email
+POST {{host}}/api/commands/mark-email-message-as-processed
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "tenantId": "{{tenantId}}",
+  "messageId": "<order-48213@shop.example>",
+  "trackerIds": ["{{trackerId}}"],
+  "note": ""
+}
+
+### --- Tracker refresh: every tracker waiting on a scrape, best first.
+### Each poll also pumps the in-process jobs (mailboxes, emails).
+GET {{host}}/api/queries/refresh-requests
+X-API-Key: {{apiKey}}
+
+### What the processor posts back after reading the carrier page. Dates are
+### YYYY-MM-DD or ''; only new/changed values become events.
+POST {{host}}/api/commands/update-tracking-shipment-status
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "tenantId": "{{tenantId}}",
+  "trackerId": "{{trackerId}}",
+  "labelCreatedOnDate": "2026-08-21",
+  "onTheWayDate": "2026-08-22",
+  "outForDeliveryDate": "",
+  "estimatedDeliveryDate": "2026-08-30",
+  "deliveredOnDate": "",
+  "errorMessage": ""
+}
+
+### --- Operational: is the mail domain live on Migadu, and if not, which
+### DNS records are still missing (?recheck=1 forces a live run)
+GET {{host}}/api/queries/mail-domain?recheck=1
+X-API-Key: {{apiKey}}

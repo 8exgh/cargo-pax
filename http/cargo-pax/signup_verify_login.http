@@ -1,0 +1,65 @@
+### Sign up: creates the account, its event stream, requests the inbox, and
+### emails a 6-digit verification code (logged when EMAIL_TEST_MODE=1)
+POST {{host}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "password": "Password1",
+  "emailIdentifier": "jane"
+}
+
+### Is an address free? (public, used live by the register and settings forms)
+GET {{host}}/api/queries/mailbox-availability?localPart=jane
+
+### Verify with the code from the email; returns a token
+POST {{host}}/api/auth/verify-account
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "code": "123456"
+}
+
+### Send a fresh code
+POST {{host}}/api/auth/resend-verification
+Content-Type: application/json
+
+{
+  "email": "jane@example.com"
+}
+
+### Login (needsVerification: true until verified)
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "jane@example.com",
+  "password": "Password1"
+}
+
+### Forgot password: appends password_reset_requested; the job emails the link
+POST {{host}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "jane@example.com"
+}
+
+### Reset password with the token from the email
+POST {{host}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "<token from the reset link>",
+  "newPassword": "Password2"
+}
+
+### Take ownership of a different @cargopax.ca address
+POST {{host}}/api/commands/assign-cargo-pax-email-identifier
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "emailIdentifier": "jane.doe"
+}
