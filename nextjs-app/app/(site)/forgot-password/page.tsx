@@ -52,7 +52,7 @@ export default function ForgotPassword() {
               It works once and expires in an hour.
             </p>
             <p className="text-sm text-gray-500">Check your spam folder if it does not arrive in a minute or two.</p>
-            <Link href="/" className="inline-block text-blue-600 hover:text-blue-800 hover:underline text-sm">
+            <Link href="/login" className="inline-block text-blue-600 hover:text-blue-800 hover:underline text-sm">
               Back to login
             </Link>
           </div>
@@ -91,7 +91,7 @@ export default function ForgotPassword() {
             </form>
 
             <div className="mt-6 border-t border-gray-100 pt-4 text-center text-sm text-gray-500">
-              <Link href="/" className="text-blue-600 hover:text-blue-800 hover:underline">
+              <Link href="/login" className="text-blue-600 hover:text-blue-800 hover:underline">
                 Back to login
               </Link>
             </div>

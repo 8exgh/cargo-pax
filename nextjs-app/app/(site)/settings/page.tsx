@@ -42,7 +42,7 @@ export default function Settings() {
     try {
       const response = await fetch('/api/queries/account', { headers: authHeaders() });
       if (response.status === 401) {
-        router.push('/');
+        router.push('/login');
         return;
       }
       if (response.status === 403) {
@@ -59,7 +59,7 @@ export default function Settings() {
 
   useEffect(() => {
     if (!localStorage.getItem('token')) {
-      router.push('/');
+      router.push('/login');
       return;
     }
     load();
@@ -118,7 +118,7 @@ export default function Settings() {
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    router.push('/');
+    router.push('/login');
   }
 
   if (loading || !account) {

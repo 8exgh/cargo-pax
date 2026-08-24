@@ -43,7 +43,7 @@ export default function Dashboard() {
       if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
-        router.push('/');
+        router.push('/login');
         return;
       }
       if (response.status === 403) {
@@ -70,7 +70,7 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/');
+      router.push('/login');
       return;
     }
     loadAccount();
@@ -117,7 +117,7 @@ export default function Dashboard() {
       });
       if (response.status === 401) {
         localStorage.removeItem('token');
-        router.push('/');
+        router.push('/login');
         return { ok: false, data: null };
       }
       const data = await response.json().catch(() => ({}));
@@ -157,7 +157,7 @@ export default function Dashboard() {
   function handleLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-    router.push('/');
+    router.push('/login');
   }
 
   if (loading) {

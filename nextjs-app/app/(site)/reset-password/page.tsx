@@ -40,7 +40,7 @@ function ResetPasswordForm() {
       }
 
       setDone(true);
-      setTimeout(() => router.push('/'), 2500);
+      setTimeout(() => router.push('/login'), 2500);
     } catch (error: any) {
       setError(error.message || 'An error occurred');
       setLoading(false);
@@ -62,7 +62,7 @@ function ResetPasswordForm() {
     return (
       <div className="text-center text-gray-700 space-y-4">
         <p>Your password has been changed. Taking you to the login page…</p>
-        <Link href="/" className="inline-block text-blue-600 hover:text-blue-800 hover:underline text-sm">
+        <Link href="/login" className="inline-block text-blue-600 hover:text-blue-800 hover:underline text-sm">
           Login now
         </Link>
       </div>

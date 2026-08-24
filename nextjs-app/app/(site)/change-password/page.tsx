@@ -16,7 +16,7 @@ export default function ChangePassword() {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/');
+      router.push('/login');
     }
   }, []);
 

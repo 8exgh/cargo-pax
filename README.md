@@ -25,6 +25,31 @@ and **no AWS**. What the original did with AWS is done here as:
 | TypeChat + GPT-3.5, five questions per page | OpenAI structured outputs, one call per page (`gpt-5.4-mini`) |
 | Postgres event store | SQLite, one event store per account |
 
+## The public site
+
+`nextjs-app/app/(marketing)/` is the part a search engine sees: home,
+`/how-it-works`, `/carriers`, `/about`, `/privacy`, and `/blog` with its
+posts (`lib/blog.tsx`). It is a separate root layout from the signed-in app,
+server-rendered with no client JavaScript, and every page is prerendered at
+build time.
+
+Signing in moved to `/login` so `/` could be a page with something on it -
+before this the most-linked URL on the site was a 45-word login form.
+
+What is deliberate here, rather than habit:
+
+- **One canonical host.** The app answers on more than one hostname, so
+  every page carries a canonical URL. That host is resolved at *build* time
+  (`getSiteUrl`, `NEXT_PUBLIC_SITE_URL`, defaulting to the live domain), not
+  at runtime: these pages are prerendered, so a runtime variable is read too
+  late and the canonical would have shipped as `http://localhost:3000`.
+- **`robots.ts` and `sitemap.ts`** list the public pages only. The signed-in
+  app is disallowed: it would yield a login screen and nothing rankable.
+- **Structured data describes what is on the page** (Organization, WebSite,
+  BlogPosting, BreadcrumbList) and nothing that is not.
+- **No doorway pages.** Each page answers a different question; there is no
+  per-carrier or per-city page repeating the same copy.
+
 ## Organizations and people
 
 Signing up creates an **organization** and makes you its admin. It has a

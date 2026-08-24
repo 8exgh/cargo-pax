@@ -18,6 +18,11 @@ ARG BUILD_TIME=unknown
 ENV GIT_COMMIT=$GIT_COMMIT
 ENV BUILD_TIME=$BUILD_TIME
 
+# The public pages are prerendered here, so the canonical host has to be
+# known now - a runtime variable would be too late.
+ARG NEXT_PUBLIC_SITE_URL=https://cargopax.ca
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+
 # Build Next.js app (creates .next directory)
 RUN npm run build
 

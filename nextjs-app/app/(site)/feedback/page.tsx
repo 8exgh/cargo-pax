@@ -19,7 +19,7 @@ export default function Feedback() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push('/');
+      router.push('/login');
       return;
     }
 

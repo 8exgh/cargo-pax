@@ -73,6 +73,19 @@ Conventions worth keeping:
 - Route files export only `GET`/`POST` (Next rejects other exports).
 - The UI keeps the JWT in localStorage, like the other 8examples sites; `/api/queries/account` answers 403 `needsVerification` for unverified accounts and the dashboard routes to `/verify`.
 
+## Public pages
+
+`app/(marketing)/` is a separate root layout from `app/(site)/`: server
+components, no client JavaScript, prerendered. `/login` is the sign-in page;
+`/` is public. `lib/seo.tsx` holds the canonical/metadata/JSON-LD helpers and
+`lib/blog.tsx` the posts.
+
+Canonical URLs come from `getSiteUrl()` (build-time `NEXT_PUBLIC_SITE_URL`,
+default `https://cargopax.ca`), **not** `getAppBaseUrl()` - the latter is a
+runtime variable for emailed links, and prerendered pages would bake in
+`http://localhost:3000`. The Dockerfile takes `NEXT_PUBLIC_SITE_URL` as a
+build arg for that reason.
+
 ## Deployment
 
 `.github/workflows/build-and-deploy.yml` → ghcr.io `cargo-pax-backend` /
