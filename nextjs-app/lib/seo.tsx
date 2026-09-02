@@ -25,21 +25,39 @@ export function pageMetadata(options: {
   type?: 'website' | 'article';
   published?: string;
   modified?: string;
+  keywords?: string[];
 }): Metadata {
   const url = canonical(options.path);
+  const socialImage = {
+    url: canonical('/social-card'),
+    width: 1200,
+    height: 630,
+    alt: 'CargoPax — parcel tracking from the shipping emails you already get'
+  };
   return {
     title: options.title,
     description: options.description,
-    alternates: { canonical: url },
+    keywords: options.keywords,
+    alternates: {
+      canonical: url,
+      types: { 'application/rss+xml': canonical('/blog/feed.xml') }
+    },
     openGraph: {
       title: options.title,
       description: options.description,
       url,
       siteName: SITE_NAME,
+      locale: 'en_CA',
       type: options.type ?? 'website',
+      images: [socialImage],
       ...(options.published ? { publishedTime: options.published, modifiedTime: options.modified } : {})
     },
-    twitter: { card: 'summary', title: options.title, description: options.description }
+    twitter: {
+      card: 'summary_large_image',
+      title: options.title,
+      description: options.description,
+      images: [socialImage]
+    }
   };
 }
 

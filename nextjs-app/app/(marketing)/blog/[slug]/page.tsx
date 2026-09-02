@@ -18,11 +18,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   return pageMetadata({
     path: `/blog/${post.slug}`,
-    title: post.title,
+    title: post.seoTitle,
     description: post.description,
     type: 'article',
     published: post.published,
-    modified: post.modified
+    modified: post.modified,
+    keywords: post.topics
   });
 }
 
@@ -32,6 +33,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
   if (!post) {
     notFound();
   }
+  const relatedPosts = posts.filter(candidate => candidate.slug !== post.slug).slice(0, 3);
 
   const articleSchema = {
     '@context': 'https://schema.org',
@@ -40,8 +42,17 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
     description: post.description,
     datePublished: post.published,
     dateModified: post.modified,
+    articleSection: post.category,
+    keywords: post.topics.join(', '),
+    image: canonical('/social-card'),
+    inLanguage: 'en-CA',
     author: { '@type': 'Organization', name: OWNER.name, url: OWNER.url },
-    publisher: { '@type': 'Organization', name: SITE_NAME, url: canonical('/') },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: canonical('/'),
+      logo: { '@type': 'ImageObject', url: canonical('/icon-512.png') }
+    },
     mainEntityOfPage: { '@type': 'WebPage', '@id': canonical(`/blog/${post.slug}`) }
   };
 
@@ -63,6 +74,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
       </nav>
 
       <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">{post.title}</h1>
+      <p className="mt-4 text-lg leading-8 text-gray-700">{post.description}</p>
       <p className="mt-3 text-sm text-gray-500">
         <time dateTime={post.published}>
           {new Date(`${post.published}T00:00:00Z`).toLocaleDateString('en-CA', {
@@ -72,7 +84,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
             timeZone: 'UTC'
           })}
         </time>{' '}
-        · {post.readingMinutes} minute read · {OWNER.name}
+        · {post.readingMinutes} minute read · {post.category} · {OWNER.name}
       </p>
 
       <div className="mt-8 space-y-4">{post.body}</div>
@@ -90,6 +102,19 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
           .
         </p>
       </div>
+
+      <aside className="mt-12 border-t border-gray-200 pt-8" aria-labelledby="related-heading">
+        <h2 id="related-heading" className="text-xl font-semibold text-gray-900">Keep reading</h2>
+        <ul className="mt-4 space-y-3">
+          {relatedPosts.map(related => (
+            <li key={related.slug}>
+              <Link href={`/blog/${related.slug}`} className="text-blue-700 underline">
+                {related.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </aside>
     </article>
   );
 }

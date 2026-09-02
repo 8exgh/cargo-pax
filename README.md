@@ -28,10 +28,12 @@ and **no AWS**. What the original did with AWS is done here as:
 ## The public site
 
 `nextjs-app/app/(marketing)/` is the part a search engine sees: home,
-`/how-it-works`, `/carriers`, `/about`, `/privacy`, and `/blog` with its
-posts (`lib/blog.tsx`). It is a separate root layout from the signed-in app,
-server-rendered with no client JavaScript, and every page is prerendered at
-build time.
+`/how-it-works`, `/shared-package-tracking`, `/carriers`, `/faq`, `/about`,
+`/privacy`, and `/blog` with its posts (`lib/blog.tsx`). It is a separate root
+layout from the signed-in app, server-rendered with no client JavaScript, and
+every page is prerendered at build time. The blog also publishes an RSS feed
+at `/blog/feed.xml`, and `/social-card` generates the Open Graph image used by
+each public page.
 
 Signing in moved to `/login` so `/` could be a page with something on it -
 before this the most-linked URL on the site was a 45-word login form.

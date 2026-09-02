@@ -13,11 +13,13 @@ export const metadata: Metadata = {
   description:
     'Forward shipping emails to your own @cargopax.ca address. CargoPax finds the tracking links, follows every parcel and tells you when things move.',
   manifest: '/manifest.webmanifest',
-  icons: { apple: '/apple-touch-icon.png' }
+  icons: { apple: '/apple-touch-icon.png' },
+  category: 'technology'
 };
 
 const NAV = [
   { href: '/how-it-works', label: 'How it works' },
+  { href: '/shared-package-tracking', label: 'For teams' },
   { href: '/carriers', label: 'Carriers' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' }
@@ -35,14 +37,14 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         </a>
 
         <header className="border-b border-gray-200">
-          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900">
               <img src="/logo.svg" alt="" width={28} height={28} className="h-7 w-7" />
               {SITE_NAME}
             </Link>
             <nav aria-label="Main" className="flex items-center gap-4 text-sm">
               {NAV.map(item => (
-                <Link key={item.href} href={item.href} className="text-gray-600 hover:text-gray-900 hidden sm:inline">
+                <Link key={item.href} href={item.href} className="text-gray-600 hover:text-gray-900 hidden md:inline">
                   {item.label}
                 </Link>
               ))}
@@ -59,7 +61,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
         <main id="main">{children}</main>
 
         <footer className="border-t border-gray-200 mt-16">
-          <div className="max-w-4xl mx-auto px-4 py-8 text-sm text-gray-600 space-y-4">
+          <div className="max-w-5xl mx-auto px-4 py-8 text-sm text-gray-600 space-y-4">
             <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2">
               {NAV.map(item => (
                 <Link key={item.href} href={item.href} className="hover:text-gray-900">
@@ -69,6 +71,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               <Link href="/privacy" className="hover:text-gray-900">
                 Privacy
               </Link>
+              <Link href="/faq" className="hover:text-gray-900">
+                FAQ
+              </Link>
+              <a href="/blog/feed.xml" className="hover:text-gray-900">
+                RSS
+              </a>
               <Link href="/login" className="hover:text-gray-900">
                 Sign in
               </Link>

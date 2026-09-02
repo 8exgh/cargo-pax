@@ -3,9 +3,9 @@ import { breadcrumbSchema, JsonLd, pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
   path: '/carriers',
-  title: 'Carriers CargoPax tracks, and the number formats it recognises',
+  title: 'Supported carriers and tracking number formats',
   description:
-    'UPS, FedEx, USPS, DHL, Canada Post and Purolator: the tracking-number formats CargoPax matches, which ones overlap, and what it reads off each carrier’s page.'
+    'Tracking number formats for UPS, FedEx, USPS, DHL, Canada Post and Purolator, including overlapping numbers and the status CargoPax reads.'
 });
 
 const CARRIERS = [
@@ -95,6 +95,10 @@ export default function Carriers() {
             what a carrier tracking page actually says
           </Link>
           .
+        </p>
+        <p className="mt-3">
+          Questions about forwarding, shared access or notifications?{' '}
+          <Link href="/faq" className="text-blue-700 underline">Read the CargoPax FAQ</Link>.
         </p>
       </div>
     </article>

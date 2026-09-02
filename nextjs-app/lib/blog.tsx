@@ -1,17 +1,21 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-/* Posts live as typed modules rather than a CMS or MDX: there is one, it is
-   written from what building this actually taught us, and a database would
-   add a dependency without adding a reader. */
+/* Posts live as typed modules rather than a CMS or MDX. They are all known at
+   build time, so keeping the content here gives readers static HTML without
+   adding a content service to a small application. */
 
 export interface Post {
   slug: string;
   title: string;
+  seoTitle: string;
   description: string;
   published: string; // ISO date
   modified: string;
   readingMinutes: number;
+  category: string;
+  audience: string;
+  topics: string[];
   body: ReactNode;
 }
 
@@ -19,19 +23,472 @@ const P = ({ children }: { children: ReactNode }) => <p className="text-gray-700
 const H2 = ({ children }: { children: ReactNode }) => (
   <h2 className="text-xl font-semibold text-gray-900 mt-10 mb-3">{children}</h2>
 );
+const H3 = ({ children }: { children: ReactNode }) => (
+  <h3 className="text-lg font-semibold text-gray-900 mt-7 mb-2">{children}</h3>
+);
 const Code = ({ children }: { children: ReactNode }) => (
   <code className="font-mono text-[0.9em] bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded">{children}</code>
 );
 
 export const posts: Post[] = [
   {
+    slug: 'track-multiple-packages-in-one-place',
+    title: 'How to track multiple packages in one place (without another spreadsheet)',
+    seoTitle: 'How to track multiple packages in one place',
+    description:
+      'A practical comparison of carrier tabs, inbox search, tracking apps and email forwarding for anyone juggling deliveries from more than one store or courier.',
+    published: '2026-09-02',
+    modified: '2026-09-02',
+    readingMinutes: 8,
+    category: 'Guide',
+    audience: 'Frequent shoppers and small teams',
+    topics: ['track multiple packages', 'all-in-one package tracking', 'multi-carrier package tracking'],
+    body: (
+      <>
+        <P>
+          One package is easy: open the message from the shop and follow its link. The problem changes when five
+          orders become seven boxes and those boxes move through UPS, FedEx, Canada Post and Purolator. Now the
+          job is not looking up a number. It is remembering which numbers exist, which person ordered each thing,
+          and which delivery has actually changed.
+        </P>
+        <P>
+          There are four sensible ways to track multiple packages. The right one depends less on how many carrier
+          logos a tool supports and more on how the tracking information enters the system.
+        </P>
+
+        <H2>The four workable approaches</H2>
+        <div className="my-5 overflow-x-auto rounded-lg border border-gray-200">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="bg-gray-50 text-gray-900">
+              <tr>
+                <th className="px-4 py-3 font-semibold">Method</th>
+                <th className="px-4 py-3 font-semibold">Best for</th>
+                <th className="px-4 py-3 font-semibold">The trade-off</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 text-gray-700">
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Carrier websites</td>
+                <td className="px-4 py-3">One or two active parcels</td>
+                <td className="px-4 py-3">Authoritative, but every carrier is a separate tab and notification list.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Inbox features</td>
+                <td className="px-4 py-3">Personal orders already in one mailbox</td>
+                <td className="px-4 py-3">Convenient, but tied to one email provider and usually one person.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Tracking app</td>
+                <td className="px-4 py-3">Broad carrier coverage and mobile use</td>
+                <td className="px-4 py-3">Automatic import may require mailbox access; manual import still means copying numbers.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Email forwarding</td>
+                <td className="px-4 py-3">A deliberate, shareable workflow</td>
+                <td className="px-4 py-3">You forward each shipping message, or carefully configure a mail rule.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <H2>Option 1: keep using the carrier sites</H2>
+        <P>
+          This is the baseline and it is often good enough. Keep the shipping messages, open the UPS or FedEx
+          link when you care, and let each carrier send its own alerts. You are seeing the carrier&rsquo;s source
+          record, with all of the scans and delivery controls it chooses to expose.
+        </P>
+        <P>
+          The method breaks down through fragmentation. A search for &ldquo;desk chair&rdquo; in your inbox might
+          find the order receipt but not the later carrier message. Split shipments create several tracking
+          numbers for one purchase. And a colleague cannot see what is coming unless you forward the updates to
+          them too. Carrier tabs are a lookup system, not a shared list.
+        </P>
+
+        <H2>Option 2: use the tracking already in your inbox</H2>
+        <P>
+          Some inboxes can identify shipping messages for you. Google, for example, documents package status and
+          estimated arrival cards in Gmail for participating carriers in the United States. It is convenient
+          because the order email is already there, though{' '}
+          <a
+            href="https://support.google.com/mail/answer/13073650?hl=en"
+            className="text-blue-700 underline"
+          >
+            Google&rsquo;s current help page
+          </a>{' '}
+          describes the feature as US-only and says it depends on smart features being enabled.
+        </P>
+        <P>
+          Inbox tracking is a strong personal default. It is less useful when orders arrive in several inboxes,
+          your team does not share an email provider, or the person receiving the parcel is not the person who
+          bought it.
+        </P>
+
+        <H2>Option 3: use a universal package tracking app</H2>
+        <P>
+          This is the broad-coverage answer. Universal trackers normalize many carrier statuses into one list,
+          send notifications and often detect a carrier from its tracking number. Some can import orders after
+          you connect Gmail or Outlook; others let you paste numbers or forward messages. AfterShip, for example,
+          documents both email linking and forwarding in{' '}
+          <a
+            href="https://support.aftership.com/en/tracking/articles/15441927-introduction-to-aftership-mobile-app"
+            className="text-blue-700 underline"
+          >
+            its current mobile-app guide
+          </a>
+          .
+        </P>
+        <P>
+          Choose this route when international carrier breadth matters most. Before connecting an inbox, check
+          what permission is requested, what is retained, whether you can add another person, and whether the
+          product is for incoming purchases or for merchants sending orders to customers. Both are called
+          &ldquo;multi-carrier tracking,&rdquo; but they solve different jobs.
+        </P>
+
+        <H2>Option 4: forward shipping emails to one tracking address</H2>
+        <P>
+          Forwarding keeps the automation but makes the boundary explicit. Instead of authorizing a service to
+          search an inbox, you send the one message it needs. The tracking address becomes a collection point:
+          you, a colleague or a family member can all forward shipping notices into the same parcel list.
+        </P>
+        <P>
+          That is the CargoPax model. Each organization gets its own <Code>@cargopax.ca</Code> inbox. CargoPax
+          checks the message for links containing a real number in the named carrier&rsquo;s format, creates the
+          shipment, follows its page and reports status changes. If forwarding by hand gets repetitive, a narrow
+          rule for known order senders can automate it without forwarding the rest of your mail.
+        </P>
+
+        <H2>What to look for in any multi-package tracker</H2>
+        <ul className="list-disc pl-6 text-gray-700 space-y-2 my-4 leading-7">
+          <li>
+            <strong>Fast capture:</strong> a list is only complete if adding the next package is easier than
+            forgetting it.
+          </li>
+          <li>
+            <strong>Clear ownership:</strong> &ldquo;printer ink&rdquo; is more useful than a 22-digit number,
+            especially in a shared view.
+          </li>
+          <li>
+            <strong>Honest carrier detection:</strong> number formats overlap. A good tool asks when the number
+            alone cannot settle the carrier.
+          </li>
+          <li>
+            <strong>Useful milestones:</strong> label created, moving, out for delivery and delivered are easier
+            to scan than six carriers&rsquo; different vocabulary.
+          </li>
+          <li>
+            <strong>Visible failures:</strong> &ldquo;the check failed&rdquo; is actionable; a stale status that looks
+            current is not.
+          </li>
+          <li>
+            <strong>The right sharing model:</strong> decide whether the list belongs to a phone, an inbox or a
+            group of people.
+          </li>
+        </ul>
+
+        <H2>A simple rule of thumb</H2>
+        <P>
+          For one person with occasional deliveries, use the inbox and carrier tools you already have. For a
+          person who orders internationally, choose breadth. For a household or small team that needs the same
+          answer to &ldquo;what is arriving?&rdquo;, choose a shared list and make forwarding the intake habit.
+        </P>
+        <P>
+          CargoPax is deliberately built for that last case. See the{' '}
+          <Link href="/shared-package-tracking" className="text-blue-700 underline">
+            shared package tracking workflow
+          </Link>{' '}
+          or start by forwarding one real shipping email.
+        </P>
+      </>
+    )
+  },
+  {
+    slug: 'shared-package-tracking-workflow-for-small-teams',
+    title: 'A shared package tracking workflow for small teams',
+    seoTitle: 'Shared package tracking for small teams',
+    description:
+      'A lightweight way for offices, studios, clinics and field teams to know what is arriving, who ordered it and when someone should be ready for it.',
+    published: '2026-08-31',
+    modified: '2026-08-31',
+    readingMinutes: 7,
+    category: 'Teams',
+    audience: 'Office managers and operations teams',
+    topics: ['shared package tracking', 'business package tracker', 'incoming delivery tracking'],
+    body: (
+      <>
+        <P>
+          Small-team delivery tracking usually begins as an accidental system. The person who placed the order
+          has the email. Someone else answers the door. A third person needs the equipment inside the box. The
+          only shared record is a message in chat asking, &ldquo;Did that arrive yet?&rdquo;
+        </P>
+        <P>
+          You do not need a warehouse platform to fix that. You need a reliable intake step, one visible list,
+          and a small set of rules for naming and closing shipments.
+        </P>
+
+        <H2>Who benefits from a shared parcel list</H2>
+        <P>
+          The useful dividing line is not company size. It is whether ordering, receiving and using the item are
+          done by different people. That shows up in design studios ordering samples, clinics receiving supplies,
+          trades waiting on parts, nonprofits ordering event materials, property teams coordinating equipment,
+          and small offices where anyone near the door becomes the receiver.
+        </P>
+        <P>
+          Canadian ecommerce is not shrinking back into a single-carrier world. Canada Post&rsquo;s 2025 annual
+          report says the domestic ecommerce market is projected to double over the next decade while competition
+          among parcel carriers is intensifying. The operational result for a small team is simple: more purchases
+          can arrive through more carrier systems.{' '}
+          <a
+            href="https://www.canadapost-postescanada.ca/cpc/en/our-company/financial-and-sustainability-reports/2025-annual-report/executive-summary.page"
+            className="text-blue-700 underline"
+          >
+            Read Canada Post&rsquo;s executive summary
+          </a>
+          .
+        </P>
+
+        <H2>The five-step workflow</H2>
+        <H3>1. Give incoming parcels one destination</H3>
+        <P>
+          Pick a tracking inbox that represents the team, not an employee. Every buyer forwards the dispatch or
+          carrier message there. A dedicated address is easier to remember and easier to hand over when roles
+          change than a spreadsheet owned by one person.
+        </P>
+
+        <H3>2. Name shipments for the person waiting</H3>
+        <P>
+          A tracking number is an identifier for a carrier, not a useful label for a team. Use a short label such
+          as &ldquo;laser toner — Mara&rdquo;, &ldquo;site 14 fasteners&rdquo; or &ldquo;September event signs&rdquo;.
+          Include the project, location or person that will make the parcel recognizable at a glance.
+        </P>
+
+        <H3>3. Let most people view, not administer</H3>
+        <P>
+          Everyone who depends on deliveries should be able to see them and request a current status. Far fewer
+          people need to delete trackers, rename the organization or manage members. Read-only access keeps the
+          shared view dependable without making it private to operations.
+        </P>
+
+        <H3>4. Act on milestones, not every scan</H3>
+        <P>
+          A depot scan at 2:14 a.m. rarely changes someone&rsquo;s day. &ldquo;Out for delivery&rdquo; might. Decide
+          which milestones cause action: prepare access, tell the site lead, clear a receiving area or follow up
+          because an estimate slipped. A useful tracking system reduces notification noise instead of reproducing
+          every carrier event.
+        </P>
+
+        <H3>5. Keep delivered shipments as a short history</H3>
+        <P>
+          Delivery status answers the first question when an item seems missing: did the carrier mark it
+          delivered, and on what day? Keep enough history to answer that before deleting or archiving the entry.
+          The tracking list is not inventory, but it is useful evidence during the handoff from carrier to team.
+        </P>
+
+        <H2>A weekly operating pattern</H2>
+        <div className="my-5 rounded-lg border border-gray-200 bg-gray-50 p-5">
+          <ul className="space-y-3 text-gray-700 leading-7">
+            <li><strong>When you order:</strong> wait for the shipping message, then forward it and check the label.</li>
+            <li><strong>Each morning:</strong> scan what is out for delivery and tell anyone who needs to receive it.</li>
+            <li><strong>When a date moves:</strong> update the project or person depending on the arrival.</li>
+            <li><strong>When it arrives:</strong> confirm the physical handoff before treating &ldquo;Delivered&rdquo; as complete.</li>
+            <li><strong>Once a week:</strong> review old or errored trackers and clean up what no longer matters.</li>
+          </ul>
+        </div>
+
+        <H2>What CargoPax covers — and what it does not</H2>
+        <P>
+          CargoPax gives an organization one forwarding mailbox and one shipment dashboard. Members see the same
+          shipments, read-only members can request a fresh check, and admins manage trackers and people. It
+          follows UPS, FedEx, USPS, DHL, Canada Post and Purolator and sends milestone updates by email or device
+          notification.
+        </P>
+        <P>
+          It is for inbound visibility before the carrier reaches you. It is not a mailroom receiving log: it
+          does not scan labels at the front desk, collect recipient signatures, assign lockers or prove that a
+          parcel reached its final person. If your risk begins after the driver drops the box, use a proper
+          mailroom system. If the recurring question is &ldquo;what is coming and when?&rdquo;, a shared tracker is the
+          smaller, better fit.
+        </P>
+
+        <H2>Start with the workflow, not the software</H2>
+        <P>
+          Write one sentence your team can follow: &ldquo;When a supplier sends a shipping notice, forward it to
+          this address and rename the parcel for the project.&rdquo; If that habit works, the list stays trustworthy.
+          If it does not, adding integrations only automates an incomplete process.
+        </P>
+        <P>
+          For the product-level version, visit{' '}
+          <Link href="/shared-package-tracking" className="text-blue-700 underline">
+            shared package tracking for small teams
+          </Link>
+          .
+        </P>
+      </>
+    )
+  },
+  {
+    slug: 'track-packages-from-email-without-inbox-access',
+    title: 'How to track packages from email without giving an app your inbox',
+    seoTitle: 'Track packages from email without inbox access',
+    description:
+      'Email can automate package tracking in three different ways. Here is what inbox scanning, manual entry and selective forwarding actually expose.',
+    published: '2026-08-28',
+    modified: '2026-08-28',
+    readingMinutes: 7,
+    category: 'Privacy',
+    audience: 'Privacy-conscious shoppers and teams',
+    topics: ['email package tracking', 'package tracker privacy', 'track packages without email access'],
+    body: (
+      <>
+        <P>
+          The useful part of a shipping email is tiny: usually a merchant name, a carrier and one tracking link.
+          Yet the easiest way for software to find that information is often to ask for read access to the inbox
+          containing everything else.
+        </P>
+        <P>
+          That does not make inbox-connected package trackers inherently unsafe. OAuth access can be read-only,
+          revocable and carefully operated. It does mean you should understand the boundary you are accepting —
+          and know that selective email forwarding is another way to get most of the convenience.
+        </P>
+
+        <H2>Three ways to get a shipping email into a tracker</H2>
+        <H3>1. Connect the whole inbox</H3>
+        <P>
+          With a connected account, the tracker searches for order and shipping messages as they arrive. This is
+          the lowest-effort method once set up, and it can recover older orders. Route&rsquo;s documentation, for
+          example, says automatic tracking uses read-only access to connected email accounts and extracts order
+          information from relevant messages.{' '}
+          <a
+            href="https://shoppers.help.route.com/hc/en-us/articles/6045160006679-Route-mobile-app-data-and-privacy-FAQ"
+            className="text-blue-700 underline"
+          >
+            Route explains its access here
+          </a>
+          .
+        </P>
+        <P>
+          &ldquo;Read-only&rdquo; is an important limit: the app cannot send or delete mail. It still means the
+          service has permission to read enough of the mailbox to find relevant messages. Review the exact scope,
+          retention policy, deletion controls and security practices rather than treating the word read-only as
+          the whole privacy answer.
+        </P>
+
+        <H3>2. Paste the tracking number yourself</H3>
+        <P>
+          Manual entry shares the least email data because the tracker receives no email at all. It receives the
+          carrier, tracking number and whatever label you add. This is the clearest choice for a rare or sensitive
+          shipment, and the easiest to understand.
+        </P>
+        <P>
+          The cost is completeness. A tracker that depends on copying every number tends to miss the parcel added
+          while you were on a phone, the second number in a split shipment, or the order made by somebody else.
+          Manual entry protects the boundary by making you do every handoff.
+        </P>
+
+        <H3>3. Forward only the shipping message</H3>
+        <P>
+          Selective forwarding moves the permission decision from the account level to the message level. The
+          tracker does not receive a key to your inbox. It receives the complete contents of the messages you
+          deliberately send to its address, just as any email recipient would.
+        </P>
+        <P>
+          That last sentence matters: forwarding is not the same as sharing only a tracking number. A shipping
+          message can include your name, delivery area, order details and parts of the earlier conversation. Trim
+          the thread before forwarding if it contains anything the tracking service does not need, and read what
+          the service says it stores.
+        </P>
+
+        <H2>Why the permission question matters</H2>
+        <P>
+          People routinely make this trade-off outside package tracking. In Consumer Reports&rsquo; 2025
+          cyber-readiness survey, four in five US adults said they adjust smartphone permissions when an app does
+          not need access to something such as contacts, location or the camera.{' '}
+          <a
+            href="https://innovation.consumerreports.org/2025-Consumer-Cyber-Readiness-Report.pdf"
+            className="text-blue-700 underline"
+          >
+            See the survey and methodology
+          </a>
+          . The relevant principle is data minimization: give a tool the information required for the job, with a
+          scope you can explain later.
+        </P>
+        <P>
+          Email providers also offer their own processing. Google says Gmail package tracking identifies tracking
+          numbers through automatic processing and shares only the number with carrier partners. It is a useful
+          example of a different trust model: the inbox provider already holds the mail, so no new third-party
+          inbox connection is needed.{' '}
+          <a href="https://support.google.com/mail/answer/13073650?hl=en" className="text-blue-700 underline">
+            Google documents the flow here
+          </a>
+          .
+        </P>
+
+        <H2>A practical privacy checklist</H2>
+        <ul className="list-disc pl-6 text-gray-700 space-y-2 my-4 leading-7">
+          <li>
+            <strong>Scope:</strong> does the app receive a tracking number, selected messages or access to search
+            the mailbox?
+          </li>
+          <li>
+            <strong>Content:</strong> what personal or order information is inside the message you are sharing?
+          </li>
+          <li>
+            <strong>Retention:</strong> is the original email kept, reduced to shipment fields or deleted after
+            processing?
+          </li>
+          <li>
+            <strong>Subprocessors:</strong> which carriers, model providers, mail hosts or notification services
+            receive any part of the data?
+          </li>
+          <li>
+            <strong>Controls:</strong> can you revoke access, delete a shipment and close the account without a
+            support maze?
+          </li>
+          <li>
+            <strong>Audience:</strong> if it is a shared tracker, who else in the group can read the forwarded
+            message?
+          </li>
+        </ul>
+
+        <H2>How CargoPax draws the boundary</H2>
+        <P>
+          CargoPax never connects to your personal or work inbox. Your organization gets a separate mailbox and
+          the software sees what you forward there. It stores the forwarded message text so members can see which
+          email produced a parcel, sends that text to OpenAI to label the shipment, and later sends carrier-page
+          text to OpenAI to interpret status. The carrier receives a request for the tracking link, as it would
+          if you opened it yourself.
+        </P>
+        <P>
+          Those are real data flows, not a claim that forwarding makes data disappear. The benefit is control:
+          you choose each message that crosses the boundary, and CargoPax never holds credentials or an OAuth
+          grant for the inbox where the rest of your life or business lives. The full current disclosure is on{' '}
+          <Link href="/privacy" className="text-blue-700 underline">
+            the CargoPax privacy page
+          </Link>
+          .
+        </P>
+
+        <H2>Which method should you choose?</H2>
+        <P>
+          Connect an inbox when zero-touch capture is worth the broader permission and you trust the provider&rsquo;s
+          controls. Paste numbers when volume is low and you want the smallest possible disclosure. Forward
+          selected messages when you want automatic extraction without granting ongoing access to the source
+          mailbox. There is no universally correct answer — only a boundary that should match the job.
+        </P>
+      </>
+    )
+  },
+  {
     slug: 'what-carrier-tracking-pages-actually-say',
     title: 'What a carrier tracking page actually says, and why software keeps getting it wrong',
+    seoTitle: 'Why carrier tracking software gets updates wrong',
     description:
-      'Six things we learned reading UPS, FedEx, USPS, DHL, Canada Post and Purolator tracking pages in production: numbers that collide, dates without years, and a page that says Delivered without saying when.',
+      'Six lessons from reading UPS, FedEx, USPS, DHL, Canada Post and Purolator pages: overlapping numbers, missing dates and rendered status updates.',
     published: '2026-08-24',
     modified: '2026-08-24',
     readingMinutes: 7,
+    category: 'Behind the tracking',
+    audience: 'Anyone evaluating tracker accuracy',
+    topics: ['carrier tracking pages', 'tracking number formats', 'parcel tracking accuracy'],
     body: (
       <>
         <P>

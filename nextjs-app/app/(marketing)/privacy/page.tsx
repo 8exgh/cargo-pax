@@ -3,9 +3,9 @@ import { breadcrumbSchema, JsonLd, pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
   path: '/privacy',
-  title: 'What CargoPax stores, and what it does not',
+  title: 'CargoPax privacy: what we store and why',
   description:
-    'A plain description of the data CargoPax holds: the emails you forward, the parcels found in them, your organization’s mailbox, and who can see any of it.'
+    'What CargoPax holds when you forward shipping emails, who in your organization can see it, and which service providers process any part of it.'
 });
 
 export default function Privacy() {

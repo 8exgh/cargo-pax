@@ -7,6 +7,7 @@ import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/site'
 export const metadata: Metadata = {
   title: SITE_NAME,
   description: SITE_DESCRIPTION,
+  robots: { index: false, follow: false },
   manifest: '/manifest.webmanifest',
   // iOS reads these when the site is added to the Home Screen
   appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: 'default' },

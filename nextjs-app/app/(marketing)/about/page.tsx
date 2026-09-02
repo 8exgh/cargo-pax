@@ -3,7 +3,7 @@ import { breadcrumbSchema, JsonLd, OWNER, pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
   path: '/about',
-  title: 'About CargoPax and the people who run it',
+  title: 'About CargoPax and 8Examples',
   description:
     'CargoPax is built and run by 8Examples in Calgary, Alberta. What it is, who maintains it, and how to reach a human about it.'
 });

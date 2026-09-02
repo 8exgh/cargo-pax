@@ -3,9 +3,9 @@ import { breadcrumbSchema, JsonLd, pageMetadata } from '@/lib/seo';
 
 export const metadata = pageMetadata({
   path: '/how-it-works',
-  title: 'How CargoPax works: forward a shipping email, get a tracked parcel',
+  title: 'How email package tracking works',
   description:
-    'What happens between forwarding a shipping email to your @cargopax.ca address and seeing the parcel on your dashboard: how links are chosen, how carrier pages are read, and what happens to the email.'
+    'See how CargoPax turns a forwarded shipping email into a tracked parcel, reads supported carrier pages and reports delivery status changes.'
 });
 
 export default function HowItWorks() {
@@ -96,6 +96,15 @@ export default function HowItWorks() {
             Create an account
           </Link>{' '}
           — it takes a name, an email and a password.
+        </p>
+        <p className="mt-3 text-sm text-gray-600">
+          Still deciding? Read the{' '}
+          <Link href="/faq" className="text-blue-700 underline">package tracking FAQ</Link>{' '}
+          or compare ways to{' '}
+          <Link href="/blog/track-multiple-packages-in-one-place" className="text-blue-700 underline">
+            track multiple packages in one place
+          </Link>
+          .
         </p>
       </div>
     </article>

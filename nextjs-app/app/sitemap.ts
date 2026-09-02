@@ -9,14 +9,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: { path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }[] = [
     { path: '/', changeFrequency: 'monthly', priority: 1 },
     { path: '/how-it-works', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/shared-package-tracking', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/carriers', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/blog', changeFrequency: 'weekly', priority: 0.6 },
+    { path: '/faq', changeFrequency: 'monthly', priority: 0.6 },
     { path: '/about', changeFrequency: 'yearly', priority: 0.4 },
-    { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 },
-    { path: '/register', changeFrequency: 'yearly', priority: 0.5 }
+    { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 }
   ];
 
-  const lastModified = new Date('2026-08-24');
+  const lastModified = new Date('2026-09-02');
 
   return [
     ...pages.map(page => ({

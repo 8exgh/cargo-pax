@@ -77,7 +77,10 @@ Conventions worth keeping:
 
 `app/(marketing)/` is a separate root layout from `app/(site)/`: server
 components, no client JavaScript, prerendered. `/login` is the sign-in page;
-`/` is public. `lib/seo.tsx` holds the canonical/metadata/JSON-LD helpers and
+`/` is public. `/shared-package-tracking` is the team-focused product page,
+`/faq` carries the visible FAQ/FAQPage data, `/blog/feed.xml` is the RSS
+feed, and `/social-card` renders the shared Open Graph image. `lib/seo.tsx`
+holds the canonical/metadata/JSON-LD helpers and
 `lib/blog.tsx` the posts.
 
 Canonical URLs come from `getSiteUrl()` (build-time `NEXT_PUBLIC_SITE_URL`,

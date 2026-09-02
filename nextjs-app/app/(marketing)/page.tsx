@@ -3,9 +3,10 @@ import { JsonLd, organizationSchema, pageMetadata, webSiteSchema } from '@/lib/s
 
 export const metadata = pageMetadata({
   path: '/',
-  title: 'CargoPax — parcel tracking from the shipping emails you already get',
+  title: 'CargoPax: parcel tracking from your shipping emails',
   description:
-    'Forward a shipping email to your own @cargopax.ca address. CargoPax pulls out the tracking links, follows every parcel across UPS, FedEx, USPS, DHL, Canada Post and Purolator, and tells you when something moves.'
+    'Forward a shipping email to your own @cargopax.ca address. Track UPS, FedEx, USPS, DHL, Canada Post and Purolator parcels in one shared view.',
+  keywords: ['email package tracking', 'shared package tracking', 'multi-carrier parcel tracker']
 });
 
 const STEPS = [
@@ -112,6 +113,12 @@ export default function Home() {
             </p>
           </div>
         </div>
+        <p className="mt-7">
+          <Link href="/shared-package-tracking" className="text-blue-700 underline">
+            See how shared package tracking works for small teams
+          </Link>
+          .
+        </p>
       </section>
 
       <section className="border-t border-gray-200 bg-gray-50">
@@ -127,26 +134,66 @@ export default function Home() {
             It also means CargoPax never needs your mailbox password or read access to your inbox. You send it
             one email at a time, and it only ever sees what you forward.
           </p>
-          <p className="mt-6">
-            <Link href="/blog/what-carrier-tracking-pages-actually-say" className="text-blue-700 underline">
-              What we learned reading carrier tracking pages in production
+          <p className="mt-6 text-gray-700">
+            Read:{' '}
+            <Link href="/blog/track-packages-from-email-without-inbox-access" className="text-blue-700 underline">
+              how email tracking works without giving an app your inbox
             </Link>
+            .
           </p>
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-4 py-14">
-        <h2 className="text-2xl font-semibold text-gray-900">Start with one parcel</h2>
-        <p className="mt-3 text-gray-700 leading-7 max-w-2xl">
-          Create an account, forward the next shipping email you get, and see whether the dates it shows you
-          match the ones the carrier eventually delivers on.
+      <section className="max-w-4xl mx-auto px-4 py-12">
+        <h2 className="text-2xl font-semibold text-gray-900">Practical package tracking guides</h2>
+        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+          <article className="rounded-lg border border-gray-200 p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Guide</p>
+            <h3 className="mt-2 font-semibold text-gray-900">
+              <Link href="/blog/track-multiple-packages-in-one-place" className="hover:text-blue-700">
+                Track multiple packages in one place
+              </Link>
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-gray-600">Compare carrier tabs, inbox features, universal apps and forwarding.</p>
+          </article>
+          <article className="rounded-lg border border-gray-200 p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Teams</p>
+            <h3 className="mt-2 font-semibold text-gray-900">
+              <Link href="/blog/shared-package-tracking-workflow-for-small-teams" className="hover:text-blue-700">
+                A small-team receiving workflow
+              </Link>
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-gray-600">Make ordering, arrival updates and handoffs visible to the same people.</p>
+          </article>
+          <article className="rounded-lg border border-gray-200 p-5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Behind the tracking</p>
+            <h3 className="mt-2 font-semibold text-gray-900">
+              <Link href="/blog/what-carrier-tracking-pages-actually-say" className="hover:text-blue-700">
+                What carrier pages actually say
+              </Link>
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-gray-600">Why overlapping numbers, missing years and rendered pages cause wrong answers.</p>
+          </article>
+        </div>
+        <p className="mt-6">
+          <Link href="/blog" className="text-blue-700 underline">Browse all package tracking guides</Link>.
         </p>
-        <Link
-          href="/register"
-          className="mt-6 inline-block bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 font-medium"
-        >
-          Create an account
-        </Link>
+      </section>
+
+      <section className="border-t border-gray-200 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-14">
+          <h2 className="text-2xl font-semibold text-gray-900">Start with one parcel</h2>
+          <p className="mt-3 text-gray-700 leading-7 max-w-2xl">
+            Create an account, forward the next shipping email you get, and see whether the dates it shows you
+            match the ones the carrier eventually delivers on.
+          </p>
+          <Link
+            href="/register"
+            className="mt-6 inline-block bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 font-medium"
+          >
+            Create an account
+          </Link>
+        </div>
       </section>
     </>
   );
