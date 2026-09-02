@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { SITE_NAME } from '@/lib/site';
+import { BrandMark, Wordmark } from '@/components/Brand';
 import { OrganizationLogo } from '@/components/OrganizationLogo';
 import type { OrganizationView } from '@/types/queries';
 
@@ -19,11 +19,16 @@ export function Header({
       <div className="max-w-3xl mx-auto flex justify-between items-center gap-4">
         <Link href="/dashboard" className="flex items-center gap-2 min-w-0">
           {organization ? (
-            <OrganizationLogo hasLogo={organization.hasLogo} version={organization.logoVersion} name={organization.name} />
+            <>
+              <OrganizationLogo hasLogo={organization.hasLogo} version={organization.logoVersion} name={organization.name} />
+              <span className="text-lg font-semibold text-gray-900 truncate">{organization.name}</span>
+            </>
           ) : (
-            <img src="/logo.svg" alt="" className="h-7 w-7" />
+            <>
+              <BrandMark />
+              <Wordmark className="text-lg" />
+            </>
           )}
-          <span className="text-lg font-semibold text-gray-900 truncate">{organization?.name ?? SITE_NAME}</span>
           {role === 'member' && (
             <span className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded whitespace-nowrap">read only</span>
           )}

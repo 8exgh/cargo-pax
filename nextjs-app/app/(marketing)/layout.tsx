@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import '../globals.css';
+import { BrandMark, Wordmark } from '@/components/Brand';
 import { getSiteUrl, SITE_NAME } from '@/lib/site';
 
 /* The public side of the site. Server-rendered with no client JavaScript:
@@ -38,9 +39,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
 
         <header className="border-b border-gray-200">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900">
-              <img src="/logo.svg" alt="" width={28} height={28} className="h-7 w-7" />
-              {SITE_NAME}
+            <Link href="/" className="flex items-center gap-2">
+              <BrandMark />
+              <Wordmark />
             </Link>
             <nav aria-label="Main" className="flex items-center gap-4 text-sm">
               {NAV.map(item => (

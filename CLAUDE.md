@@ -65,6 +65,7 @@ Conventions worth keeping:
 
 - Event names are snake_case and follow the original cargopax backend where a concept exists there.
 - Web push needs no Apple/Firebase accounts, just the VAPID keypair in devops (`CARGO_PAX_VAPID_*`); `app/manifest.ts` + `public/icon-*.png` exist so the iOS Home Screen install looks right, and `send-test-push` is how you confirm an install took.
+- The mark (kraft parcel with a map pin) is drawn once in `scripts/generate-icons.mjs`; `public/logo.svg`, `app/icon.svg`, `app/favicon.ico`, the manifest/apple/maskable PNGs and the monochrome `badge-96.png` are all its output - rerun it, never hand-edit them. `components/Brand.tsx` pairs the mark with the two-tone wordmark; `/social-card` embeds the same SVG.
 - Outbound side effects always pair with a marker event; a failed send leaves no marker and retries on the next pump. Shipment-update emails batch every pending change per tracker and wait until its scrape completes.
 - Mailbox passwords, verification codes and reset tokens are stored in events in plaintext (owner decision, same as 8examples). Codes/tokens are single-use and expire.
 - Only carrier hosts (or `TRACKING_ALLOWED_HOSTS`) are ever loaded in the browser; email-found links must be on a carrier host and carry a token in that carrier's real tracking-number format (`TRACKING_NUMBER_PATTERNS` in `carrier.ts`). A pasted url still gets a best-effort number when nothing matches.

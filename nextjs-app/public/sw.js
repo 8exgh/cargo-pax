@@ -24,7 +24,7 @@ self.addEventListener('push', event => {
   const options = {
     body: payload.body || '',
     icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    badge: '/badge-96.png',
     // Same tracker replaces its previous notification instead of stacking
     tag: payload.tag || 'cargopax',
     renotify: Boolean(payload.tag),

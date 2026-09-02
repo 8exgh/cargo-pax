@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SITE_NAME } from '@/lib/site';
+import { Wordmark } from '@/components/Brand';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -65,8 +66,8 @@ export default function Home() {
           alt={SITE_NAME}
           className="mx-auto mb-4 h-16 w-16"
         />
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">
-          {SITE_NAME}
+        <h1 className="text-3xl font-bold text-center mb-2">
+          <Wordmark />
         </h1>
         <p className="text-center text-gray-600 mb-8">
           Forward your shipment emails to your own @cargopax.ca address and watch every package arrive.
