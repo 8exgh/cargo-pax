@@ -204,8 +204,9 @@ dashboard is current behind the notification.
 Screen - never from a Safari tab - so the Settings page detects iOS-in-a-tab
 and shows the Add to Home Screen steps instead of a button that cannot work.
 The manifest (`app/manifest.ts`) and icons exist to make that install look
-right; every icon is rendered from the one drawing in
-`scripts/generate-icons.mjs`. `POST /api/commands/send-test-push` sends a
+right; every icon is rendered by `scripts/generate-icons.mjs` from the one
+drawing in `scripts/brand-mark.mjs`, and so is the promo video
+(`scripts/render-promo.mjs` → `public/promo.mp4`). `POST /api/commands/send-test-push` sends a
 test notification, which is the only way to be certain an iOS install took.
 
 ### Email
