@@ -32,6 +32,192 @@ const Code = ({ children }: { children: ReactNode }) => (
 
 export const posts: Post[] = [
   {
+    slug: 'track-ups-fedex-tracking-numbers',
+    title: 'How to track UPS and FedEx tracking numbers in one place',
+    seoTitle: 'Track UPS and FedEx tracking numbers in one place',
+    description:
+      'Track UPS and FedEx tracking numbers without juggling carrier tabs. Learn the quickest workflow for checking, organizing and sharing package updates.',
+    published: '2026-09-04',
+    modified: '2026-09-04',
+    readingMinutes: 7,
+    category: 'UPS & FedEx',
+    audience: 'Online shoppers, households and small teams',
+    topics: [
+      'UPS tracking number',
+      'FedEx tracking number',
+      'track UPS and FedEx packages',
+      'UPS and FedEx tracking in one place'
+    ],
+    body: (
+      <>
+        <P>
+          A UPS tracking number and a FedEx tracking number solve the same basic problem: each tells you where a
+          package is and what should happen next. The inconvenience begins when the numbers are scattered across
+          order emails, text messages and two carrier websites — especially when several people need the answer.
+        </P>
+        <P>
+          The quickest approach is simple. Use the carrier page when you need to manage one delivery. Use one
+          package list when you need to remember several UPS and FedEx shipments, recognize what is inside them,
+          or share their progress with somebody else.
+        </P>
+
+        <H2>How to track a UPS tracking number</H2>
+        <P>
+          Copy the number from the retailer&rsquo;s shipping confirmation or the message from UPS, open the{' '}
+          <a href="https://www.ups.com/track" className="text-blue-700 underline">
+            official UPS tracking page
+          </a>{' '}
+          and paste it into the tracking field. UPS says its own tracking page provides the most up-to-date
+          information about a shipment. For a familiar small-package number, look for <Code>1Z</Code> followed by
+          16 letters and digits. UPS also uses other formats for services such as InfoNotice and Mail Innovations,
+          as its{' '}
+          <a href="https://www.ups.com/us/en/support/tracking-support" className="text-blue-700 underline">
+            tracking support guide
+          </a>{' '}
+          explains.
+        </P>
+        <P>
+          The result may show that UPS has received only the shipment details, that the parcel is on the way, that
+          it is out for delivery or that it has been delivered. If you need to reroute the parcel, correct an
+          address, request a hold or see every scan, continue on UPS. A multi-carrier tracker is useful for the
+          overview; the carrier remains the place for delivery controls.
+        </P>
+
+        <H2>How to track a FedEx tracking number</H2>
+        <P>
+          Find the tracking ID in the shipping message, then enter it on the{' '}
+          <a href="https://www.fedex.com/en-ca/tracking.html" className="text-blue-700 underline">
+            official FedEx tracking page
+          </a>
+          . FedEx&rsquo;s page can show the current status, an estimated delivery window when available, and options
+          for email, text or app notifications. It may also offer a hold at a FedEx retail location or other
+          delivery choices for an eligible shipment.
+        </P>
+        <P>
+          Do not assume a new FedEx tracking number is broken just because it has no scans. FedEx explains in its{' '}
+          <a
+            href="https://www.fedex.com/en-ca/contact-us/faq/track-packages/package-status/no-updates.html"
+            className="text-blue-700 underline"
+          >
+            guide to tracking numbers without updates
+          </a>{' '}
+          that shipment details appear after it receives the package; a retailer can create the number while the
+          box is still at the sender&rsquo;s location. A pause at &ldquo;label created&rdquo; can therefore be a handoff
+          delay, not a tracking failure.
+        </P>
+
+        <H2>How to track UPS and FedEx packages in one place</H2>
+        <P>
+          Repeating the two lookups above works for an occasional order. It becomes surprisingly easy to lose
+          track when one purchase is split into three boxes, UPS is delivering office supplies, and FedEx is
+          carrying the part somebody needs tomorrow. A combined list removes the memory work.
+        </P>
+        <div className="my-5 rounded-lg border border-gray-200 bg-gray-50 p-5">
+          <ol className="list-decimal pl-5 text-gray-700 space-y-3 leading-7">
+            <li>Paste each UPS or FedEx tracking number into CargoPax, or forward the original shipping email.</li>
+            <li>Give the parcel a useful name such as &ldquo;reception printer&rdquo; or &ldquo;Mara&rsquo;s replacement laptop&rdquo;.</li>
+            <li>Check one dashboard for what is moving, arriving next or already delivered.</li>
+            <li>Let email or device notifications bring important status changes to you.</li>
+          </ol>
+        </div>
+        <P>
+          Forwarding is often the most convenient intake method because the carrier link and tracking number are
+          already in the message. CargoPax receives only the shipping emails you choose to send to your tracking
+          address; it does not need access to search your personal or work inbox. If you already have the number,
+          pasting it is just as valid.
+        </P>
+
+        <H2>Why CargoPax may ask which carrier you have</H2>
+        <P>
+          A typical UPS number beginning with <Code>1Z</Code> identifies itself clearly. Numeric tracking numbers
+          can be less obvious. A 12-digit number, for example, can fit both FedEx and Purolator, while longer
+          numeric formats can overlap across several carriers. Guessing would risk following the wrong page and
+          reporting no result.
+        </P>
+        <P>
+          CargoPax selects the carrier when the number format is distinctive and asks you to choose when it is
+          not. You can avoid the question by pasting the original carrier link, because its UPS or FedEx domain
+          settles the answer. See the complete list of{' '}
+          <Link href="/carriers" className="text-blue-700 underline">
+            supported carrier tracking-number formats
+          </Link>
+          .
+        </P>
+
+        <H2>What one package list makes easier</H2>
+        <ul className="list-disc pl-6 text-gray-700 space-y-2 my-4 leading-7">
+          <li>
+            <strong>Less tab switching:</strong> UPS and FedEx shipments appear in the same view even though each
+            carrier still has its own tracking system.
+          </li>
+          <li>
+            <strong>Names instead of numbers:</strong> a label tells you what is arriving without reopening the
+            retailer&rsquo;s order email.
+          </li>
+          <li>
+            <strong>One notification habit:</strong> you do not need to configure alerts separately for every
+            package on every carrier.
+          </li>
+          <li>
+            <strong>Shared visibility:</strong> a household or team can see the same incoming deliveries without
+            forwarding every status update to one another.
+          </li>
+          <li>
+            <strong>A short delivery history:</strong> when a box seems missing, you can first confirm whether it
+            was marked delivered and on what day.
+          </li>
+        </ul>
+
+        <H2>Why is my UPS or FedEx tracking number not working?</H2>
+        <P>
+          First, copy the number again without surrounding punctuation. CargoPax removes ordinary spaces and
+          dashes, but it cannot repair a missing digit. Next, check whether the sender has handed the parcel to
+          the carrier. A created label is not the same as a carrier pickup, and the first useful scan may take
+          time to appear. Also look for a second number: retailers often split one order into several packages.
+        </P>
+        <P>
+          If the number still produces no result, open the shipping email&rsquo;s original tracking link. That
+          confirms the carrier and takes you to its source record. FedEx notes that scans can be more than 24
+          hours apart during long-distance travel in its{' '}
+          <a
+            href="https://www.fedex.com/en-ca/contact-us/faq/track-packages/package-status/package-not-moving.html"
+            className="text-blue-700 underline"
+          >
+            explanation of packages that are not moving
+          </a>, so a package that has not changed today is not necessarily stuck. Contact the seller or carrier when
+          the source page reports an exception, a missed delivery or a delivered package you cannot find.
+        </P>
+
+        <H2>Can I track UPS and FedEx without an account?</H2>
+        <P>
+          You can enter an individual tracking number on the public UPS or FedEx tracking page without creating
+          a carrier account. Carrier accounts become useful when you want their enhanced delivery-management
+          features. CargoPax is the better fit when the job is keeping packages from different carriers in one
+          recognizable, shareable list.
+        </P>
+
+        <H2>The convenient rule of thumb</H2>
+        <P>
+          Keep the carrier sites as the source of detail and control. Use CargoPax as the place you remember what
+          is coming. Forward the shipping email when it arrives, name the package for the person who cares about
+          it, and let the next meaningful update come to you.
+        </P>
+        <P>
+          If UPS and FedEx are only part of the mix, CargoPax also supports USPS, DHL, Canada Post and Purolator.
+          Read how to{' '}
+          <Link href="/blog/track-multiple-packages-in-one-place" className="text-blue-700 underline">
+            track multiple packages in one place
+          </Link>{' '}
+          or{' '}
+          <Link href="/how-it-works" className="text-blue-700 underline">
+            see how email forwarding becomes package tracking
+          </Link>
+          .
+        </P>
+      </>
+    )
+  },
+  {
     slug: 'track-multiple-packages-in-one-place',
     title: 'How to track multiple packages in one place (without another spreadsheet)',
     seoTitle: 'How to track multiple packages in one place',

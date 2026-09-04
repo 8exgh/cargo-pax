@@ -17,7 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/privacy', changeFrequency: 'yearly', priority: 0.3 }
   ];
 
-  const lastModified = new Date('2026-09-02');
+  const lastModified = new Date('2026-09-04');
 
   return [
     ...pages.map(page => ({
