@@ -32,6 +32,178 @@ const Code = ({ children }: { children: ReactNode }) => (
 
 export const posts: Post[] = [
   {
+    slug: 'track-package-without-tracking-number',
+    title: 'How to track a UPS or FedEx package without a tracking number',
+    seoTitle: 'Track a UPS or FedEx package without a tracking number',
+    description:
+      'Lost the tracking number, or never had it? Every way to find it or work around it: the shipping email, the order page, UPS My Choice and FedEx Delivery Manager, reference numbers, the sender, and a forwarding address that means you never need the number again.',
+    published: '2026-09-04',
+    modified: '2026-09-04',
+    readingMinutes: 7,
+    category: 'UPS & FedEx',
+    audience: 'Anyone waiting on a parcel they cannot look up',
+    topics: [
+      'track package without tracking number',
+      'lost UPS tracking number',
+      'track FedEx package without tracking number',
+      'find tracking number in email',
+      'UPS My Choice',
+      'FedEx Delivery Manager'
+    ],
+    body: (
+      <>
+        <P>
+          The carrier sites are blunt about it: you cannot look up a parcel on ups.com or fedex.com without its
+          tracking number. What they do not say is that you almost certainly have the number already, and that
+          both carriers offer a way to see parcels headed to your address without typing a number at all. Here
+          are the routes, fastest first, and one way to stop needing the number altogether.
+        </P>
+
+        <H2>1. It is in the shipping email, even when you cannot see it</H2>
+        <P>
+          Every retailer sends a message when the parcel leaves. Search your inbox for the store&rsquo;s name
+          together with &ldquo;shipped&rdquo;, &ldquo;on its way&rdquo;, or &ldquo;tracking&rdquo;. The number is
+          usually printed under a heading like &ldquo;Track your package&rdquo;, and it looks like one of a few
+          shapes: <Code>1Z</Code> followed by sixteen letters and digits for UPS, twelve or fifteen digits for
+          FedEx, twenty to twenty-two digits starting with 9 for USPS, sixteen digits for Canada Post.
+        </P>
+        <P>
+          Sometimes the email shows only a button. The number is still there; it is inside the link. On a phone,
+          press and hold the button and choose copy link, then paste it somewhere you can read it. On a computer,
+          hover the button and read the address in the corner of the browser. The long token after{' '}
+          <Code>tracknum=</Code>, <Code>trackingnumber=</Code>, or <Code>tracknumbers=</Code> is the number. Paste
+          the whole link into CargoPax and it pulls the number out for you; the{' '}
+          <Link href="/carriers" className="text-blue-700 underline">
+            carriers page
+          </Link>{' '}
+          lists which links it understands.
+        </P>
+
+        <H2>2. The retailer&rsquo;s order page keeps it when the email is gone</H2>
+        <P>
+          If the message was deleted or went to someone else&rsquo;s inbox, the order itself still exists. Sign in
+          to the store, open your orders, and look for a track button or a shipment section. Large marketplaces
+          show the carrier and number on the order; most independent stores run a hosted order-status page that
+          shows the same thing. This is also the place to look when a single order shipped in more than one box,
+          because each box has its own number and the email often lists only the first.
+        </P>
+
+        <H2>3. Let the carrier show you what is coming to your address</H2>
+        <P>
+          This is the answer to the literal question. Both major carriers run a free service that lists parcels
+          addressed to you, without you supplying a number.
+        </P>
+        <H3>UPS My Choice</H3>
+        <P>
+          A UPS My Choice account, once your address is confirmed, shows UPS parcels headed to that address and
+          sends delivery alerts as they move. It is free at the basic level. It also lets you change delivery
+          options for eligible shipments, which the plain tracking page does not. UPS describes its tracking
+          options, including reference tracking, in its{' '}
+          <a href="https://www.ups.com/us/en/support/tracking-support" className="text-blue-700 underline">
+            tracking support guide
+          </a>
+          .
+        </P>
+        <H3>FedEx Delivery Manager</H3>
+        <P>
+          <a href="https://www.fedex.com/en-ca/delivery-manager.html" className="text-blue-700 underline">
+            FedEx Delivery Manager
+          </a>{' '}
+          works the same way: sign up, confirm your address, and shipments to it appear with their status and
+          numbers, at no extra charge, with the option to redirect a delivery to a FedEx location if you will not
+          be home.
+        </P>
+        <P>
+          Two limits apply to both. They show parcels only after the carrier has received the shipment data, so a
+          box the retailer has not handed over yet will not be there. And they show parcels addressed to the
+          address you verified, so a delivery going to the office, a parent&rsquo;s house, or a parcel locker will
+          not appear on your home account.
+        </P>
+
+        <H2>4. Track by reference number</H2>
+        <P>
+          When a shipper creates a label they can attach a reference: usually your order number, sometimes a
+          purchase-order or invoice number. UPS and FedEx both let you look a parcel up by that reference instead
+          of the tracking number, typically together with the ship date range and the destination postal code.
+          FedEx exposes this on its{' '}
+          <a href="https://www.fedex.com/en-us/tracking/advanced.html" className="text-blue-700 underline">
+            advanced tracking page
+          </a>
+          ; UPS offers it from its tracking page. It works only when the shipper actually attached a reference,
+          which large retailers usually do and small ones often do not.
+        </P>
+
+        <H2>5. Ask the person who sent it</H2>
+        <P>
+          The sender has the number on the receipt and on the label. A gift, a marketplace purchase from an
+          individual, or a return shipment from a repair shop are the cases where this is the fastest route, and
+          the sender can usually paste it from their own confirmation in seconds. If a UPS driver left a slip on
+          the door, the InfoNotice number printed on it, a letter followed by ten digits, tracks the parcel on its
+          own.
+        </P>
+
+        <H2>6. Stop needing the number</H2>
+        <P>
+          Every route above is a search for a string of characters that was in your email the whole time. The
+          reason it feels like work is that the number has to be copied from where it arrived to where you check
+          it, once per parcel, for every parcel, by whoever happened to get the message.
+        </P>
+        <P>
+          CargoPax removes that step. Each account gets its own forwarding address at cargopax.ca. Forward the
+          shipping email to it, or set a rule in your mail client to forward store messages automatically, and the
+          number is read out of the message, the carrier is identified, and the parcel is added to one list that
+          updates as the carrier posts scans and emails you when something changes. Nobody types a number. Nobody
+          looks up which site to type it into. If several people at home or at work receive shipping emails, they
+          all forward to the same address and see the same list.
+        </P>
+        <P>
+          Forwarding a message is not the same as connecting your inbox; the tracker sees only what you send it.
+          The trade-offs between the two are in{' '}
+          <Link href="/blog/track-packages-from-email-without-inbox-access" className="text-blue-700 underline">
+            our post on tracking from email without inbox access
+          </Link>
+          . And when you do have a bare number, pasting it works too: the carrier is worked out from the
+          number&rsquo;s format, and you are asked to choose only when two carriers use the same shape.
+        </P>
+
+        <H2>When you have the number and it still says nothing</H2>
+        <P>
+          A number that returns &ldquo;not found&rdquo; or sits at &ldquo;label created&rdquo; is usually a parcel
+          the carrier has not picked up yet, not a wrong number. FedEx says as much in its{' '}
+          <a
+            href="https://www.fedex.com/en-ca/contact-us/faq/track-packages/package-status/no-updates.html"
+            className="text-blue-700 underline"
+          >
+            guide to shipments with no updates
+          </a>
+          . Give it a business day. What each status means and when to worry is covered in{' '}
+          <Link href="/blog/track-ups-fedex-tracking-numbers" className="text-blue-700 underline">
+            how to track UPS and FedEx numbers in one place
+          </Link>
+          .
+        </P>
+
+        <H2>Quick answers</H2>
+        <H3>Can I track a UPS package by address?</H3>
+        <P>
+          Not from the public tracking page, but a free UPS My Choice account tied to your verified address lists
+          the UPS parcels headed there.
+        </P>
+        <H3>Can I track a FedEx package by name or address?</H3>
+        <P>
+          Through FedEx Delivery Manager, yes, for the address you verified. Without an account, FedEx needs the
+          tracking number or a shipper reference with a date range and destination.
+        </P>
+        <H3>What does a tracking number look like?</H3>
+        <P>
+          UPS: <Code>1Z</Code> plus sixteen characters. FedEx: twelve or fifteen digits, sometimes twenty or
+          twenty-two. USPS: twenty to twenty-two digits beginning with 9. Canada Post: sixteen digits, or two
+          letters, nine digits and <Code>CA</Code> for international. Purolator: a twelve-digit PIN.
+        </P>
+      </>
+    )
+  },
+  {
     slug: 'track-ups-fedex-tracking-numbers',
     title: 'How to track UPS and FedEx tracking numbers in one place',
     seoTitle: 'Track UPS and FedEx tracking numbers in one place',
