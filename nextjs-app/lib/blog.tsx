@@ -32,6 +32,298 @@ const Code = ({ children }: { children: ReactNode }) => (
 
 export const posts: Post[] = [
   {
+    slug: 'why-tracking-number-is-not-updating',
+    title: 'Why is my tracking number not updating? 8 reasons package status goes quiet',
+    seoTitle: 'Why is my tracking number not updating? 8 reasons',
+    description:
+      'A tracking number can stop updating while a package is still moving. Learn why scans lag, labels appear early and how CargoPax keeps watch.',
+    published: '2026-09-04',
+    modified: '2026-09-04',
+    readingMinutes: 9,
+    category: 'Tracking help',
+    audience: 'Anyone waiting on a package that appears stuck',
+    topics: [
+      'tracking number not updating',
+      'package tracking not updating',
+      'tracking status not updating',
+      'why is my package not moving',
+      'keep track of packages'
+    ],
+    body: (
+      <>
+        <P>
+          A tracking number can stay unchanged while the package carrying it travels hundreds of kilometres.
+          That feels contradictory only because a tracking page looks like a live map. Usually it is not. It is
+          a record of events — label created, accepted, sorted, departed, out for delivery — published when the
+          carrier captures and shares them.
+        </P>
+        <P>
+          Refreshing the page can reveal a newly published event. It cannot create a scan the carrier has not
+          made. That distinction explains most cases where package tracking is not updating, and it is central to
+          how CargoPax works: keep every tracking number in one place, ask all supported carriers for a fresh
+          status together, record what changed and show you when a check itself failed.
+        </P>
+
+        <div className="my-5 rounded-lg border border-blue-200 bg-blue-50 p-5 text-gray-800 leading-7">
+          <strong>The short answer:</strong> a quiet tracking page usually means the sender has created a label but
+          not handed over the parcel, the package is travelling between scan points, or another organization is
+          handling the next part of the journey. Wait when the delivery estimate is still current. Investigate
+          when that date has passed, the carrier reports an exception, or a delivered parcel is missing.
+        </div>
+
+        <H2>Tracking is a stream of scans, not a live location</H2>
+        <P>
+          UPS says movement information is captured each time a package is scanned. Canada Post says it tracks
+          delivery by scanning package barcodes, while Purolator says its online information changes whenever a
+          shipment passes through one of its facilities. Those descriptions matter: no new checkpoint can mean
+          no new public event even while a truck, aircraft or container is moving normally.
+        </P>
+        <P>
+          The carrier page remains the source record. CargoPax reads the public tracking result — using a compact
+          tracking answer when one is available and the carrier page as the fallback — then turns different
+          carrier vocabulary into a short common journey: label created, on the way, out for delivery, estimated
+          delivery and delivered. It makes the information easier to follow across carriers; it cannot see beyond
+          what a carrier has published.
+        </P>
+
+        <H2>1. The label exists before the carrier has the box</H2>
+        <P>
+          A merchant can reserve a tracking number and print a label before packing the order or arranging a
+          pickup. UPS defines &ldquo;Label Created&rdquo; as having received shipment and billing details; the status
+          changes after UPS takes possession. FedEx similarly says details begin updating once it receives the
+          package. DHL eCommerce says the first tracking event generally appears only after the shipment leaves
+          the merchant&rsquo;s fulfilment centre.
+        </P>
+        <P>
+          This is the most common reason a brand-new tracking number is not updating. The carrier is not
+          necessarily late, because its journey has not started. If the merchant promised that the order shipped
+          days ago but the status still says only &ldquo;label created&rdquo;, ask the merchant when the physical handoff
+          happened.
+        </P>
+
+        <H2>2. Long travel produces long gaps between scans</H2>
+        <P>
+          UPS notes that a long-distance shipment may remain &ldquo;On the Way&rdquo; until it reaches its destination
+          hub. FedEx says a package can go more than 24 hours without a new scan, particularly during long travel.
+          Canada Post says several days without a public update can occur after departure, and Purolator says the
+          same can happen when the next facility is more than a day away.
+        </P>
+        <P>
+          Four carriers describing the same behaviour is a useful reality check: a stale-looking timestamp is not
+          by itself evidence that the parcel is stationary. Compare it with the estimated delivery date and any
+          exception message before deciding that it is stuck.
+        </P>
+
+        <H2>3. Some services publish milestones, not every movement</H2>
+        <P>
+          Tracking detail depends on the service that was purchased. DHL eCommerce explicitly describes many of
+          its shipments as &ldquo;milestone tracking&rdquo;, with time between visible events, and notes that some
+          packages have limited events in the destination country. USPS likewise says the tracking information
+          available depends on the mail class and extra services attached to the item.
+        </P>
+        <P>
+          A sparse history is therefore not always missing data. Sometimes sparse history is the product. A
+          tracker can organize those milestones and notify you when they change, but it cannot turn a
+          milestone-only service into door-to-door telemetry.
+        </P>
+
+        <H2>4. Another carrier may handle the last mile</H2>
+        <P>
+          One logo at checkout does not guarantee one network all the way to the door. DHL eCommerce says it
+          works with postal providers around the world for delivery, and cross-border mail commonly passes from
+          the originating carrier to a destination postal service. Updates can pause during that handoff or
+          appear with less detail after it.
+        </P>
+        <P>
+          Keep the original tracking link because it is usually the best place to see the consolidated journey.
+          If the page names a local delivery partner or shows another reference number, save that too. CargoPax
+          follows the carrier link it was given; it does not assume an undocumented second number belongs to the
+          same parcel.
+        </P>
+
+        <H2>5. Customs creates a real information gap</H2>
+        <P>
+          An international parcel can be moving perfectly normally until it enters customs review. Canada Post
+          explains that clearance times vary with the package, its paperwork and current volume, and that neither
+          Canada Post nor the other postal administration can intervene while customs is reviewing it. DHL also
+          lists customs among the reasons tracking may remain unchanged.
+        </P>
+        <P>
+          In that situation, more frequent refreshes do not make the review faster. Watch for a request for duties,
+          taxes or documents, verify any payment request through the carrier&rsquo;s official site, and wait for a
+          release or exception event.
+        </P>
+
+        <H2>6. A scan and its public appearance are separate events</H2>
+        <P>
+          A barcode can be scanned before the corresponding status becomes visible online. Canada Post says some
+          network conditions prevent it from displaying current or past tracking events, and that a delivery
+          event is normally visible immediately but can take until noon the next business day. Its help centre
+          also warns that tracking information can be temporarily unavailable even when the parcel was mailed.
+        </P>
+        <P>
+          This is why CargoPax distinguishes &ldquo;the carrier reported no new milestone&rdquo; from &ldquo;we could not
+          read the tracking page.&rdquo; A visible check error is more honest than silently presenting an old status
+          as though it was just confirmed.
+        </P>
+
+        <H2>7. The delivery date is a forecast, not a scan</H2>
+        <P>
+          Estimated delivery can change without a dramatic tracking event. UPS says an exception may change the
+          scheduled date and that the tracking result will show the new date. Weather, road closures, customs,
+          address problems and network volume can all move the forecast.
+        </P>
+        <P>
+          CargoPax stores an estimated-delivery change separately from physical milestones. That prevents a new
+          date from being mistaken for proof that the package reached another facility, while still surfacing the
+          change that matters when somebody is planning to receive it.
+        </P>
+
+        <H2>8. &ldquo;Delivered&rdquo; describes the carrier event, not the handoff inside your building</H2>
+        <P>
+          UPS says an unsigned delivery may be left in a safe place, and Canada Post has distinct states for a
+          safe drop, community mailbox, parcel locker and post-office pickup. USPS makes the reverse point too:
+          the absence of a delivery scan does not necessarily prove that an item was not delivered because the
+          scan itself may have been missed.
+        </P>
+        <P>
+          Treat &ldquo;Delivered&rdquo; as the start of the receiving check. Look at the carrier&rsquo;s timestamp,
+          photo or location note, then check entrances, mailrooms, lockers, neighbours and colleagues. CargoPax
+          records the carrier&rsquo;s milestone; it is not proof that the parcel reached the final person.
+        </P>
+
+        <H2>How CargoPax keeps a mixed carrier list current</H2>
+        <P>
+          CargoPax is designed for the part carriers do not solve together. Forward a shipping email or paste a
+          tracking number, and the parcel gets an initial status check. When you choose <strong>Refresh all</strong>,
+          every undelivered shipment on a supported carrier is queued for a new read, so UPS, FedEx, USPS, DHL,
+          Canada Post and Purolator do not require six rounds of copying and pasting.
+        </P>
+        <ul className="list-disc pl-6 text-gray-700 space-y-2 my-4 leading-7">
+          <li>
+            <strong>One intake:</strong> shipping emails from several people can go to the same CargoPax address.
+          </li>
+          <li>
+            <strong>One vocabulary:</strong> different carrier phrases become the same five useful journey stages.
+          </li>
+          <li>
+            <strong>Change detection:</strong> an unchanged refresh creates no new milestone; a changed estimate or
+            status is recorded and can trigger a notification.
+          </li>
+          <li>
+            <strong>Visible failures:</strong> a blocked, empty or unreadable carrier page is shown as an error you
+            can retry, rather than disguised as a current result.
+          </li>
+          <li>
+            <strong>Shared context:</strong> useful names such as &ldquo;site 14 fasteners&rdquo; replace a wall of
+            numbers, and everyone in the organization sees the same list.
+          </li>
+        </ul>
+        <P>
+          CargoPax checks when a tracker is added and when you request a refresh; it does not claim continuous GPS
+          tracking. That deliberate boundary keeps the status faithful to published carrier information and makes
+          a failed check visible.
+        </P>
+
+        <H2>When should you wait, refresh or ask for help?</H2>
+        <div className="my-5 overflow-x-auto rounded-lg border border-gray-200">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="bg-gray-50 text-gray-900">
+              <tr>
+                <th className="px-4 py-3 font-semibold">What you see</th>
+                <th className="px-4 py-3 font-semibold">What it usually means</th>
+                <th className="px-4 py-3 font-semibold">Useful next step</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 text-gray-700">
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Not found or label created</td>
+                <td className="px-4 py-3">The sender created the number before handoff.</td>
+                <td className="px-4 py-3">Wait 24–48 hours, then ask the sender if it remains unchanged.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">In transit with no new scan</td>
+                <td className="px-4 py-3">The parcel may be travelling to its next hub.</td>
+                <td className="px-4 py-3">Refresh later and watch the estimated delivery date.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Customs or exception</td>
+                <td className="px-4 py-3">The shipment may need time, payment or information.</td>
+                <td className="px-4 py-3">Read the official carrier detail and follow its requested action.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Past the expected date</td>
+                <td className="px-4 py-3">The original forecast is no longer useful.</td>
+                <td className="px-4 py-3">Check service alerts, then contact the sender or carrier.</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 font-medium text-gray-900">Delivered but missing</td>
+                <td className="px-4 py-3">It may be safe-dropped, misdelivered or inside a receiving area.</td>
+                <td className="px-4 py-3">Check the carrier detail and location before starting a claim.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <H2>Official carrier guidance behind these answers</H2>
+        <P>
+          These behaviours are documented in the carriers&rsquo; own current help pages: UPS on{' '}
+          <a
+            href="https://www.ups.com/ca/en/support/tracking-support/where-is-my-package/understanding-tracking-status"
+            className="text-blue-700 underline"
+          >
+            tracking-status meanings
+          </a>
+          , FedEx on{' '}
+          <a
+            href="https://www.fedex.com/en-ca/contact-us/faq/track-packages/package-status/package-not-moving.html"
+            className="text-blue-700 underline"
+          >
+            packages that appear not to move
+          </a>
+          , Canada Post on{' '}
+          <a
+            href="https://www.canadapost-postescanada.ca/cpc/en/support/kb/tracking/tracking-status-not-updating.page"
+            className="text-blue-700 underline"
+          >
+            tracking that is not updating
+          </a>
+          , Purolator in its{' '}
+          <a href="https://www.purolator.com/en/resources-support/faqs/receiving" className="text-blue-700 underline">
+            receiving FAQ
+          </a>
+          , DHL in its{' '}
+          <a href="https://www.dhl.com/ca-en/home/customer-service/ecommerce-tracking-faq.html" className="text-blue-700 underline">
+            tracking and shipment-status FAQ
+          </a>{' '}
+          and USPS in{' '}
+          <a href="https://faq.usps.com/articles/FAQ/USPS-Tracking-The-Basics" className="text-blue-700 underline">
+            USPS Tracking: The Basics
+          </a>
+          .
+        </P>
+
+        <H2>Stop monitoring numbers; monitor meaningful change</H2>
+        <P>
+          The useful question is rarely &ldquo;Did the page produce another line?&rdquo; It is &ldquo;Did the delivery
+          become something I need to act on?&rdquo; Keep every incoming parcel in one named list, refresh that list
+          together, and pay attention to changed dates, exceptions, out-for-delivery events and delivery.
+        </P>
+        <P>
+          See{' '}
+          <Link href="/how-it-works" className="text-blue-700 underline">
+            how CargoPax reads a forwarded shipping email
+          </Link>{' '}
+          or compare the ways to{' '}
+          <Link href="/blog/track-multiple-packages-in-one-place" className="text-blue-700 underline">
+            track multiple packages in one place
+          </Link>
+          .
+        </P>
+      </>
+    )
+  },
+  {
     slug: 'track-package-without-tracking-number',
     title: 'How to track a UPS or FedEx package without a tracking number',
     seoTitle: 'Track a UPS or FedEx package without a tracking number',
@@ -151,10 +443,11 @@ export const posts: Post[] = [
         <P>
           CargoPax removes that step. Each account gets its own forwarding address at cargopax.ca. Forward the
           shipping email to it, or set a rule in your mail client to forward store messages automatically, and the
-          number is read out of the message, the carrier is identified, and the parcel is added to one list that
-          updates as the carrier posts scans and emails you when something changes. Nobody types a number. Nobody
-          looks up which site to type it into. If several people at home or at work receive shipping emails, they
-          all forward to the same address and see the same list.
+          number is read out of the message, the carrier is identified, and the parcel is added to one list.
+          CargoPax checks it once immediately; later, one <strong>Refresh all</strong> request checks every
+          undelivered parcel and reports newly found changes. Nobody types a number or looks up which site to type
+          it into. If several people at home or at work receive shipping emails, they all forward to the same
+          address and see the same list.
         </P>
         <P>
           Forwarding a message is not the same as connecting your inbox; the tracker sees only what you send it.
@@ -177,8 +470,8 @@ export const posts: Post[] = [
             guide to shipments with no updates
           </a>
           . Give it a business day. What each status means and when to worry is covered in{' '}
-          <Link href="/blog/track-ups-fedex-tracking-numbers" className="text-blue-700 underline">
-            how to track UPS and FedEx numbers in one place
+          <Link href="/blog/why-tracking-number-is-not-updating" className="text-blue-700 underline">
+            why a tracking number is not updating
           </Link>
           .
         </P>
@@ -327,8 +620,8 @@ export const posts: Post[] = [
             retailer&rsquo;s order email.
           </li>
           <li>
-            <strong>One notification habit:</strong> you do not need to configure alerts separately for every
-            package on every carrier.
+            <strong>One notification habit:</strong> after a refresh finds a change, you do not need separate
+            alert settings for every package on every carrier.
           </li>
           <li>
             <strong>Shared visibility:</strong> a household or team can see the same incoming deliveries without
@@ -372,7 +665,7 @@ export const posts: Post[] = [
         <P>
           Keep the carrier sites as the source of detail and control. Use CargoPax as the place you remember what
           is coming. Forward the shipping email when it arrives, name the package for the person who cares about
-          it, and let the next meaningful update come to you.
+          it, and use one refresh to check every undelivered shipment for meaningful changes.
         </P>
         <P>
           If UPS and FedEx are only part of the mix, CargoPax also supports USPS, DHL, Canada Post and Purolator.
